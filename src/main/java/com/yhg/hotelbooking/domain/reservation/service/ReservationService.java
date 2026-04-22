@@ -31,7 +31,7 @@ public class ReservationService {
     }
 
     public ReservationResponse getRs(Long rsId) {
-        Reservation rs = reservationRepository.findById(rsId).orElseThrow(() -> new CustomException(ErrorCode.HOTEL_NOT_FOUND));
+        Reservation rs = reservationRepository.findById(rsId).orElseThrow(() -> new CustomException(ErrorCode.RESERVATION_NOT_FOUND));
         return ReservationResponse.from(rs);
     }
 
@@ -45,7 +45,7 @@ public class ReservationService {
     @Transactional
     public ReservationResponse setCheckInRs(Long rsId) {
 
-        Reservation rs = reservationRepository.findById(rsId).orElseThrow(() -> new CustomException(ErrorCode.HOTEL_NOT_FOUND));
+        Reservation rs = reservationRepository.findById(rsId).orElseThrow(() -> new CustomException(ErrorCode.RESERVATION_NOT_FOUND));
         if (rs.getCheckInDate().equals(LocalDate.now())) {
             rs.checkIn();
             return ReservationResponse.from(rs);
@@ -75,7 +75,7 @@ public class ReservationService {
     public void deleteRs(Long rsId) {
         Reservation rs = reservationRepository.findById(rsId).orElseThrow(() -> new CustomException(ErrorCode.HOTEL_NOT_FOUND));
         if (rs.getStatus() != Reservationstatus.PENDING) {
-            throw new CustomException(ErrorCode.NOT_DLETE_STATUS);
+            throw new CustomException(ErrorCode.NOT_DELETE_STATUS);
         }
         reservationRepository.deleteById(rsId);
     }

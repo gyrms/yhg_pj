@@ -18,9 +18,4 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
             "AND r.status = 'CONFIRMED'")
     Optional<Reservation> findConfirmedById(@Param("rsId") Long rsId);
 
-    @Query("SELECT DISTINCT r FROM Reservation r " +
-            "JOIN FETCH r.roomType rt " +
-            "WHERE r.id = :rsId " +
-            "AND r.status = 'CONFIRMED'")
-    Optional<Reservation> findConfirmedById(@Param("rsId") Long rsId);
 }

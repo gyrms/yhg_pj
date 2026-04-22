@@ -49,9 +49,9 @@ public class Reservation {
     @Column(nullable = false)
     private LocalDate checkOutDate;
 
-    private LocalDateTime lateArrival;
+    private boolean lateArrival;
 
-    private LocalDateTime earlyCheckout;
+    private boolean earlyCheckout;
 
     @Column(nullable = false)
     private Integer totalPrice;
@@ -62,7 +62,7 @@ public class Reservation {
     @Builder
     public Reservation(RoomType roomType, OtaChannel otaChannel, String guestName,
                        String guestPhone, LocalDate checkInDate, LocalDate checkOutDate,
-                       LocalDateTime lateArrival,LocalDateTime earlyCheckout,
+                       boolean lateArrival,boolean earlyCheckout,
                        Integer totalPrice) {
         this.roomType = roomType;
         this.otaChannel = otaChannel;
