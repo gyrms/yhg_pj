@@ -19,7 +19,12 @@ public enum ErrorCode {
     INVENTORY_NOT_FOUND(HttpStatus.BAD_REQUEST, "해당 날짜의 재고 정보가 없습니다."),
     ALLOTMENT_NOT_FOUND(HttpStatus.BAD_REQUEST, "해당 OTA의 할당 재고 정보가 없습니다."),
 
+    NOT_CHECKOUT_DATE(HttpStatus.BAD_REQUEST, "체크아웃 날짜가 지났습니다."),
+    NOT_DLETE_STATUS(HttpStatus.BAD_REQUEST, "취소할 수 없는 상태입니다."),
 
+    NOT_CHECKIN_STATUS(HttpStatus.BAD_REQUEST, "체크인 상태가 아닙니다."),
+
+    NOT_CHECKIN_DATE(HttpStatus.BAD_REQUEST, "체크인 날짜가 아닙니다."),
     RESERVATION_NOT_FOUND(HttpStatus.NOT_FOUND, "예약을 찾을수 없습니다. 정보가 없습니다.");
 
 

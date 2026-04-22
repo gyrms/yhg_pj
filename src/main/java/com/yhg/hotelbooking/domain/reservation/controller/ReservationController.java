@@ -16,26 +16,46 @@ import java.util.List;
 @RequiredArgsConstructor
 public class ReservationController {
 
-    private final ReservationService hotelService;
+    private final ReservationService reservationService;
 
     //  GET    /api/reservations
     @GetMapping
     public ResponseEntity<List<ReservationResponse>> getAllReservations() {
-        List<ReservationResponse> response = hotelService.getAllRs();
+        List<ReservationResponse> response = reservationService.getAllRs();
         return ResponseEntity.ok(response);
     }
 
-  //  GET    /api/reservations/{id}
-  @GetMapping("/{id}")
-  public ResponseEntity<ReservationResponse> getOrder(@PathVariable("id") Long rsId) {
-      ReservationResponse response = hotelService.getRs(rsId);
-      return ResponseEntity.ok(response);
-  }
+    //  GET    /api/reservations/{id}
+    @GetMapping("/{id}")
+    public ResponseEntity<ReservationResponse> getOrder(@PathVariable("id") Long rsId) {
+        ReservationResponse response = reservationService.getRs(rsId);
+        return ResponseEntity.ok(response);
+    }
+
+    //POST   /api/reservations/{id}/checkin
+    @PostMapping("/ck/{id}/checkin")
+    public ResponseEntity<CheckInResponse> getCheckInReservation(@PathVariable("id") Long rsId) {
+        CheckInResponse response = reservationService.getCheckInRs(rsId);
+        return ResponseEntity.ok(response);
+    }
 
     //POST   /api/reservations/{id}/checkin
     @PostMapping("/{id}/checkin")
-    public ResponseEntity<CheckInResponse> getCheckinReservations(@PathVariable("id") Long rsId) {
-        CheckInResponse response = hotelService.getCheckInRs(rsId);
+    public ResponseEntity<ReservationResponse> setCheckInReservation(@PathVariable("id") Long rsId) {
+        ReservationResponse response = reservationService.setCheckInRs(rsId);
         return ResponseEntity.ok(response);
+    }
+    ///api/reservations/{id}/checkout
+    @PostMapping("/{id}/checkout")
+    public ResponseEntity<ReservationResponse> setCheckOutReservation(@PathVariable("id") Long rsId) {
+        ReservationResponse response = reservationService.setCheckOutRs(rsId);
+        return ResponseEntity.ok(response);
+    }
+
+    //DELETE /api/reservations/{id}
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> delReservation(@PathVariable("id") Long rsId) {
+        reservationService.deleteRs(rsId);
+        return ResponseEntity.noContent().build();
     }
 }

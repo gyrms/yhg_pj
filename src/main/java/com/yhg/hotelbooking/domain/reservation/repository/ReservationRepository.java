@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface ReservationRepository extends JpaRepository<Reservation, Long> {
 
@@ -15,6 +16,11 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
             "JOIN FETCH r.roomType rt " +
             "WHERE r.id = :rsId " +
             "AND r.status = 'CONFIRMED'")
-    Reservation findConfirmedById(@Param("rsId") Long rsId);
+    Optional<Reservation> findConfirmedById(@Param("rsId") Long rsId);
 
+    @Query("SELECT DISTINCT r FROM Reservation r " +
+            "JOIN FETCH r.roomType rt " +
+            "WHERE r.id = :rsId " +
+            "AND r.status = 'CONFIRMED'")
+    Optional<Reservation> findConfirmedById(@Param("rsId") Long rsId);
 }
