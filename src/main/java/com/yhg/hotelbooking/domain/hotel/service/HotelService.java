@@ -22,13 +22,6 @@ public class HotelService {
 
     @Transactional
     public HotelResponse enroll(HotelRequest request) {
-/*
-        if (hotelRepository.existsById(request.getHotelAddress())) {
-            throw new CustomException(ErrorCode.HOTEL_ALREADY_EXISTS);
-        }
-
-
- */
 
         // Service
         if (hotelRepository.existsByAddress(request.getHotelAddress())) {

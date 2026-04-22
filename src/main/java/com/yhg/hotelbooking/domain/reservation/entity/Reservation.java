@@ -74,7 +74,22 @@ public class Reservation {
         this.lateArrival = lateArrival;
         this.earlyCheckout = earlyCheckout;
         this.nights = (int) ChronoUnit.DAYS.between(checkInDate, checkOutDate);
-        this.status = status.PENDING;  // 기본값                                         
+        this.status = Reservationstatus.PENDING; // 기본값
+    }
+    public void confirm() {
+        this.status = Reservationstatus.CONFIRMED;
+    }
+
+    public void cancel() {
+        this.status = Reservationstatus.CANCELLED;
+    }
+
+    public void checkIn() {
+        this.status = Reservationstatus.CHECKED_IN;
+    }
+
+    public void checkOut() {
+        this.status = Reservationstatus.CHECKED_OUT;
     }
 
 }

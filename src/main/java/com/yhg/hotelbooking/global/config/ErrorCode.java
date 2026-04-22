@@ -17,7 +17,11 @@ public enum ErrorCode {
     HOTEL_NOT_FOUND(HttpStatus.NOT_FOUND, "존재하지 않는 호텔입니다."),
     ROOM_TYPE_NOT_FOUND(HttpStatus.NOT_FOUND, "존재하지 않는 객실 타입입니다"),
     INVENTORY_NOT_FOUND(HttpStatus.BAD_REQUEST, "해당 날짜의 재고 정보가 없습니다."),
-    ALLOTMENT_NOT_FOUND(HttpStatus.BAD_REQUEST, "해당 OTA의 할당 재고 정보가 없습니다.");
+    ALLOTMENT_NOT_FOUND(HttpStatus.BAD_REQUEST, "해당 OTA의 할당 재고 정보가 없습니다."),
+
+
+    RESERVATION_NOT_FOUND(HttpStatus.NOT_FOUND, "예약을 찾을수 없습니다. 정보가 없습니다.");
+
 
     private final HttpStatus status;
     private final String message;

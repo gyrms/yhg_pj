@@ -1,0 +1,27 @@
+package com.yhg.hotelbooking.domain.reservation.dto.response;
+
+import com.yhg.hotelbooking.domain.reservation.entity.Reservation;
+import lombok.Getter;
+
+import java.time.LocalDate;
+
+@Getter
+public class CheckInResponse {
+    private final Long id;
+    private final String guestName;
+    private final LocalDate checkInDate;
+    private final LocalDate checkOutDate;
+    private final Integer nights;
+
+    public static CheckInResponse from(Reservation reservation) {
+        return new CheckInResponse(reservation);
+    }
+
+    private CheckInResponse(Reservation reservation) {
+        this.id = reservation.getId();
+        this.guestName = reservation.getGuestName();
+        this.checkInDate = reservation.getCheckInDate();
+        this.checkOutDate = reservation.getCheckOutDate();
+        this.nights = reservation.getNights();
+    }
+}

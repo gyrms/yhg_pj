@@ -25,12 +25,12 @@ public class ReservationResponse {
 
     private ReservationResponse(Reservation reservation) {
         this.id = reservation.getId();
-        this.otaChannel = reservation.getOtaChannel();
+        this.otaChannel = reservation.getOtaChannel().name();
         this.guestName = reservation.getGuestName();
         this.checkInDate = reservation.getCheckInDate();
         this.checkOutDate = reservation.getCheckOutDate();
         this.nights = reservation.getNights();
-        this.status = reservation.getStatus();
+        this.status = reservation.getStatus().name();
         this.createdAt = reservation.getCreatedAt();
 
     }
