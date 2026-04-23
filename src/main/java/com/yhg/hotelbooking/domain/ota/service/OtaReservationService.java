@@ -33,18 +33,13 @@ public class OtaReservationService {
     private final OtaChannelAllotmentRepository otaChannelAllotmentRepository;
     private final ReservationRepository reservationRepository;
 
-
-
     public void delete(String otaResId) {
-
         OtaRequestLog otaRequestLog = otaRequestLogRepository.findByOtaReservationId(otaResId).orElseThrow(() -> new CustomException(ErrorCode.DUPLICATE_RESERVATION));
         Reservation rv = otaRequestLog.getReservation();
         rv.cancel();
         setRecoverRoomInventory(rv,rv.getRoomType());
         setRecoverRoomOtaAllotment(rv,rv.getRoomType());
-
     }
-
 
     public OtaReservationResponse confirm(String otaResId) {
 
@@ -57,6 +52,7 @@ public class OtaReservationService {
         rv.confirm();
         return OtaReservationResponse.from(rv, otaRequestLog.getOtaReservationId());
     }
+
     public OtaReservationResponse createReservation(OtaReservationRequest request) {
         // 1. 멱등성 확인
         if (otaRequestLogRepository.existsByOtaChannelAndOtaReservationId(request.getOtaChannel(), request.getOtaReservationId())) {
@@ -72,7 +68,6 @@ public class OtaReservationService {
 
         checkRoomInventory(request, roomType, true);
         checkOtaAllotment(request, roomType, true);
-
 
         Reservation rv = Reservation.builder()
                 .roomType(roomType)
@@ -96,8 +91,6 @@ public class OtaReservationService {
         return OtaReservationResponse.from(rv, request.getOtaReservationId());
 
     }
-
-
 
     private void checkRoomInventory(OtaReservationRequest request, RoomType roomType, boolean isplay) {
 
@@ -141,6 +134,7 @@ public class OtaReservationService {
             rdi.restore();
         }
     }
+
     private void setRecoverRoomOtaAllotment(Reservation rv, RoomType roomType) {
         for (LocalDate date = rv.getCheckInDate(); date.isBefore(rv.getCheckOutDate()); date = date.plusDays(1)) {
             OtaChannelAllotment ota = otaChannelAllotmentRepository
