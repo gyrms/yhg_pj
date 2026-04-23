@@ -4,6 +4,7 @@ import com.yhg.hotelbooking.domain.allotment.entity.OtaChannelAllotment;
 import com.yhg.hotelbooking.domain.allotment.repository.OtaChannelAllotmentRepository;
 import com.yhg.hotelbooking.domain.inventory.entity.RoomDateInventory;
 import com.yhg.hotelbooking.domain.inventory.repository.RoomDateInventoryRepository;
+import com.yhg.hotelbooking.domain.ota.dto.request.OtaModifyRequest;
 import com.yhg.hotelbooking.domain.ota.dto.request.OtaReservationRequest;
 import com.yhg.hotelbooking.domain.ota.dto.response.OtaReservationResponse;
 import com.yhg.hotelbooking.domain.ota.entity.OtaRequestLog;
@@ -32,6 +33,38 @@ public class OtaReservationService {
     private final RoomDateInventoryRepository roomDateInventoryRepository;
     private final OtaChannelAllotmentRepository otaChannelAllotmentRepository;
     private final ReservationRepository reservationRepository;
+
+
+    public OtaReservationResponse update(String otaResId, OtaModifyRequest request) {
+   /*     1. otaReservationId 로 OtaRequestLog 조회
+        2. 연결된 Reservation 꺼내기
+        3. PENDING or CONFIRMED 상태인지 확인 (취소된 건 수정 불가)
+        4. 기존 날짜별 재고 원복 (기존 체크인~아웃)
+        5. 새 날짜 재고 확인 (새 체크인~아웃)
+        6. 새 날짜 재고 차감
+        7. Reservation 날짜/금액 업데이트*/
+
+        OtaRequestLog otaRequestLog = otaRequestLogRepository.findByOtaReservationId(otaResId).orElseThrow(() -> new CustomException(ErrorCode.RESERVATION_NOT_FOUND));
+        Reservation rv = otaRequestLog.getReservation();
+
+        if (rv.getStatus() == Reservationstatus.PENDING || rv.getStatus() == Reservationstatus.CONFIRMED) {
+
+            setRecoverRoomInventory(rv,rv.getRoomType());
+
+            for (LocalDate date = rv.getCheckInDate(); date.isBefore(rv.getCheckOutDate()); date = date.plusDays(1)) {
+                RoomDateInventory rdi = roomDateInventoryRepository
+                        .findByRoomTypeAndDate(rv.getRoomType(), date)
+                        .orElseThrow(() -> new CustomException(ErrorCode.INVENTORY_NOT_FOUND));
+
+                    rdi.book();
+
+            }
+            rv.modify(request.getCheckInDate(),request.getCheckOutDate(),request.getTotalPrice());
+            return OtaReservationResponse.from(rv, otaRequestLog.getOtaReservationId());
+        }else{
+            throw new CustomException(ErrorCode.CAN_NOT_CHANGE_CONFIRMABLE_STATUS);
+        }
+    }
 
     public void delete(String otaResId) {
         OtaRequestLog otaRequestLog = otaRequestLogRepository.findByOtaReservationId(otaResId).orElseThrow(() -> new CustomException(ErrorCode.RESERVATION_NOT_FOUND));

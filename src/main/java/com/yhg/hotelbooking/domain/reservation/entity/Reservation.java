@@ -93,5 +93,12 @@ public class Reservation {
         this.status = Reservationstatus.CHECKED_OUT;
     }
 
+    public void modify(LocalDate checkInDate, LocalDate checkOutDate, Integer totalPrice) {
+        this.checkInDate = checkInDate;
+        this.checkOutDate = checkOutDate;
+        this.totalPrice = totalPrice;
+        this.nights = (int) ChronoUnit.DAYS.between(checkInDate, checkOutDate);
+    }
+
 }
 
