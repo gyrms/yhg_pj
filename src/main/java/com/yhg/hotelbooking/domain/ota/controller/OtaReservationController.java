@@ -29,7 +29,7 @@ public class OtaReservationController {
     }
 
     @DeleteMapping("/{otaResId}")
-    public ResponseEntity<Void> Delete(@PathVariable("otaResId") String otaResId) {
+    public ResponseEntity<Void> delete(@PathVariable("otaResId") String otaResId) {
         otaReservationService.delete(otaResId);
         return ResponseEntity.noContent().build();
     }
