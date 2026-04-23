@@ -25,11 +25,11 @@ import java.time.LocalDateTime;
 @EntityListeners(AuditingEntityListener.class)
 public class OtaRequestLog {
 
-/*id
-ota_channel
-ota_reservation_id   ← OTA 측 예약 ID
-request_type         ← CREATE / MODIFY / CANCEL
-processed_at*/
+    /*id
+    ota_channel
+    ota_reservation_id   ← OTA 측 예약 ID
+    request_type         ← CREATE / MODIFY / CANCEL
+    processed_at*/
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
