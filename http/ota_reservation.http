@@ -1,0 +1,78 @@
+### OTA 예약 요청 수신 (야놀자)
+### 순서: 호텔 등록 → 객실 타입 등록 → 이 요청 실행
+POST http://localhost:8080/api/ota/reservations
+Content-Type: application/json
+
+{
+  "otaChannel": "YANOLJA",
+  "otaReservationId": "YANOLJA-RES-001",
+  "roomTypeId": 1,
+  "guestName": "홍길동",
+  "guestPhone": "010-1234-5678",
+  "checkInDate": "2026-05-01",
+  "checkOutDate": "2026-05-03",
+  "totalPrice": 200000
+}
+
+###
+
+### OTA 예약 요청 수신 (여기어때)
+POST http://localhost:8080/api/ota/reservations
+Content-Type: application/json
+
+{
+  "otaChannel": "YEOGI",
+  "otaReservationId": "YEOGI-RES-001",
+  "roomTypeId": 1,
+  "guestName": "김철수",
+  "guestPhone": "010-9876-5432",
+  "checkInDate": "2026-05-01",
+  "checkOutDate": "2026-05-02",
+  "totalPrice": 100000
+}
+
+###
+
+### OTA 예약 요청 수신 (요기서)
+POST http://localhost:8080/api/ota/reservations
+Content-Type: application/json
+
+{
+  "otaChannel": "YOGISEO",
+  "otaReservationId": "YOGISEO-RES-001",
+  "roomTypeId": 1,
+  "guestName": "이영희",
+  "guestPhone": "010-1111-2222",
+  "checkInDate": "2026-05-02",
+  "checkOutDate": "2026-05-04",
+  "totalPrice": 200000
+}
+
+###
+
+### OTA 예약 확정 (otaReservationId로 확정)
+POST http://localhost:8080/api/ota/reservations/YANOLJA-RES-001/confirm
+Content-Type: application/json
+
+###
+
+### OTA 예약 취소 (otaReservationId로 취소 + 재고 원복)
+DELETE http://localhost:8080/api/ota/reservations/YANOLJA-RES-001
+Content-Type: application/json
+
+###
+
+### 멱등성 테스트 - 동일 요청 재전송 (DUPLICATE_RESERVATION 에러 확인)
+POST http://localhost:8080/api/ota/reservations
+Content-Type: application/json
+
+{
+  "otaChannel": "YANOLJA",
+  "otaReservationId": "YANOLJA-RES-001",
+  "roomTypeId": 1,
+  "guestName": "홍길동",
+  "guestPhone": "010-1234-5678",
+  "checkInDate": "2026-05-01",
+  "checkOutDate": "2026-05-03",
+  "totalPrice": 200000
+}

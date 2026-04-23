@@ -1,0 +1,27 @@
+### 전체 예약 조회
+GET http://localhost:8080/api/reservations
+Content-Type: application/json
+
+###
+
+### 예약 단건 조회
+GET http://localhost:8080/api/reservations/1
+Content-Type: application/json
+
+###
+
+### 체크인 (오늘 날짜 == 체크인 날짜여야 가능)
+POST http://localhost:8080/api/reservations/1/checkin
+Content-Type: application/json
+
+###
+
+### 체크아웃 (CHECKED_IN 상태여야 가능)
+POST http://localhost:8080/api/reservations/1/checkout
+Content-Type: application/json
+
+###
+
+### 예약 취소 (PENDING 상태만 가능)
+DELETE http://localhost:8080/api/reservations/1
+Content-Type: application/json
