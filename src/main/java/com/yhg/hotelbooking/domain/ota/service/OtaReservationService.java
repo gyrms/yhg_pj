@@ -34,7 +34,7 @@ public class OtaReservationService {
     private final ReservationRepository reservationRepository;
 
     public void delete(String otaResId) {
-        OtaRequestLog otaRequestLog = otaRequestLogRepository.findByOtaReservationId(otaResId).orElseThrow(() -> new CustomException(ErrorCode.DUPLICATE_RESERVATION));
+        OtaRequestLog otaRequestLog = otaRequestLogRepository.findByOtaReservationId(otaResId).orElseThrow(() -> new CustomException(ErrorCode.RESERVATION_NOT_FOUND));
         Reservation rv = otaRequestLog.getReservation();
         rv.cancel();
         setRecoverRoomInventory(rv,rv.getRoomType());
@@ -56,7 +56,7 @@ public class OtaReservationService {
     public OtaReservationResponse createReservation(OtaReservationRequest request) {
         // 1. 멱등성 확인
         if (otaRequestLogRepository.existsByOtaChannelAndOtaReservationId(request.getOtaChannel(), request.getOtaReservationId())) {
-            throw new CustomException(ErrorCode.RESERVATION_NOT_FOUND);
+            throw new CustomException(ErrorCode.DUPLICATE_RESERVATION);
         }
 
         // 2. RoomType 조회
