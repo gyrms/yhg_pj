@@ -37,7 +37,7 @@ public class OtaReservationService {
 
     public void delete(String otaResId) {
 
-        OtaRequestLog otaRequestLog = otaRequestLogRepository.findByOtaReservationId(otaResId).orElseThrow(() -> new CustomException(ErrorCode.RESERVATION_NOT_FOUND));
+        OtaRequestLog otaRequestLog = otaRequestLogRepository.findByOtaReservationId(otaResId).orElseThrow(() -> new CustomException(ErrorCode.DUPLICATE_RESERVATION));
         Reservation rv = otaRequestLog.getReservation();
         rv.cancel();
         setRecoverRoomInventory(rv,rv.getRoomType());
@@ -97,20 +97,6 @@ public class OtaReservationService {
 
     }
 
-    public void setDeleteReservation(String otaResId) {
-
-        OtaRequestLog otaRequestLog = otaRequestLogRepository.findByOtaReservationId(otaResId).orElseThrow(() -> new CustomException(ErrorCode.HOTEL_NOT_FOUND));
-
-        Reservation rv = otaRequestLog.getReservation();
-        rv.cancel();
-
-        RoomType roomType = rv.getRoomType();
-
-        setRecoverRoomInventory(rv,roomType);
-
-        setRecoverRoomOtaAllotment(rv,roomType);
-
-    }
 
 
     private void checkRoomInventory(OtaReservationRequest request, RoomType roomType, boolean isplay) {

@@ -21,12 +21,6 @@ public class OtaReservationController {
         return ResponseEntity.ok(response);
     }
 
-    @DeleteMapping("/{otaResId}")
-    public ResponseEntity<Void> setDeleteReservation(@PathVariable("otaResId") String otaResId) {
-        otaReservationService.setDeleteReservation(otaResId);
-        return ResponseEntity.noContent().build();
-    }
-
     @PostMapping("/{otaResId}/confirm")
     public ResponseEntity<OtaReservationResponse> confirm(@PathVariable("otaResId") String otaResId) {
         OtaReservationResponse response = otaReservationService.confirm(otaResId);
