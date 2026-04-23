@@ -37,13 +37,6 @@ public class OtaReservationService {
 
 
     public OtaReservationResponse update(String otaResId, OtaModifyRequest request) {
-   /*     1. otaReservationId 로 OtaRequestLog 조회
-        2. 연결된 Reservation 꺼내기
-        3. PENDING or CONFIRMED 상태인지 확인 (취소된 건 수정 불가)
-        4. 기존 날짜별 재고 원복 (기존 체크인~아웃)
-        5. 새 날짜 재고 확인 (새 체크인~아웃)
-        6. 새 날짜 재고 차감
-        7. Reservation 날짜/금액 업데이트*/
 
         OtaRequestLog otaRequestLog = otaRequestLogRepository.findByOtaReservationId(otaResId).orElseThrow(() -> new CustomException(ErrorCode.RESERVATION_NOT_FOUND));
         Reservation rv = otaRequestLog.getReservation();
@@ -57,10 +50,10 @@ public class OtaReservationService {
 
 
         checkRoomInventory(request.getCheckInDate(),request.getCheckOutDate(), rv.getRoomType(), false);
-        checkOtaAllotment(request.getCheckInDate(),request.getCheckOutDate(), request.getOtaChannel(),rv.getRoomType(),false);
+        checkOtaAllotment(request.getCheckInDate(),request.getCheckOutDate(), rv.getOtaChannel(),rv.getRoomType(),false);
 
         checkRoomInventory(request.getCheckInDate(),request.getCheckOutDate(), rv.getRoomType(), true);
-        checkOtaAllotment(request.getCheckInDate(),request.getCheckOutDate(), request.getOtaChannel(),rv.getRoomType(), true);
+        checkOtaAllotment(request.getCheckInDate(),request.getCheckOutDate(), rv.getOtaChannel(),rv.getRoomType(), true);
             rv.modify(request.getCheckInDate(),request.getCheckOutDate(),request.getTotalPrice());
 
 
