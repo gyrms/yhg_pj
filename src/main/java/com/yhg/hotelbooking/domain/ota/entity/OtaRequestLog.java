@@ -55,26 +55,16 @@ public class OtaRequestLog {
 
     @Builder
     public OtaRequestLog(OtaChannel otaChannel, String otaReservationId,
-                         Reservation reservation) {
+                         Reservation reservation,RequestType requestType) {
         this.otaChannel = otaChannel;
         this.otaReservationId = otaReservationId;
         this.reservation = reservation;
-        this.requestType = RequestType.CREATE;
+        this.requestType = requestType;
     }
 
-    public void create() {
-        this.requestType = RequestType.CREATE;
-    }
 
-    public void modify() {
-        this.requestType = RequestType.MODIFY;
-    }
-
-    public void cancel() {
-        this.requestType = RequestType.CANCEL;
-    }
 
 }
-}
+
 
 

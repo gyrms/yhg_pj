@@ -37,9 +37,13 @@ public class OtaReservationService {
 
         OtaRequestLog otaRequestLog = otaRequestLogRepository.findById(otaResId).orElseThrow(() -> new CustomException(ErrorCode.HOTEL_NOT_FOUND));
         Reservation rv = otaRequestLog.getReservation();
-        if(rv.getStatus()== Reservationstatus.PENDING){
-            rv.confirm();
+
+        if (rv.getStatus() != Reservationstatus.PENDING) {
+            throw new CustomException(ErrorCode.NOT_CONFIRMABLE_STATUS);
         }
+
+        rv.confirm();
+
         return OtaReservationResponse.from(rv, otaRequestLog.getOtaReservationId());
 
      /*   1. otaReservationId 로 예약 조회
@@ -83,6 +87,7 @@ public class OtaReservationService {
                 .otaChannel(request.getOtaChannel())
                 .otaReservationId(request.getOtaReservationId())
                 .reservation(rv)
+                .requestType(RequestType.CREATE)
                 .build();
         otaRequestLogRepository.save(otaRequestLog);
 
@@ -117,7 +122,7 @@ public class OtaReservationService {
             ota.cancel();
 
         }
-        otaRequestLog.cancel();
+
     }
 
 
