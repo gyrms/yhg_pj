@@ -1,0 +1,59 @@
+package com.yhg.hotelbooking.domain.room.service;
+
+import com.yhg.hotelbooking.domain.hotel.dto.request.HotelRequest;
+import com.yhg.hotelbooking.domain.hotel.dto.response.HotelResponse;
+import com.yhg.hotelbooking.domain.hotel.entity.Hotel;
+import com.yhg.hotelbooking.domain.hotel.repository.HotelRepository;
+import com.yhg.hotelbooking.domain.room.dto.request.RoomTypeRequest;
+import com.yhg.hotelbooking.domain.room.dto.response.RoomTypeResponse;
+import com.yhg.hotelbooking.domain.room.entity.RoomType;
+import com.yhg.hotelbooking.domain.room.repository.RoomTypeRepository;
+import com.yhg.hotelbooking.global.config.CustomException;
+import com.yhg.hotelbooking.global.config.ErrorCode;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
+import java.util.stream.Collectors;
+
+@Service
+@RequiredArgsConstructor
+public class RoomTypeService {
+    private final RoomTypeRepository roomTypeRepository;
+    private final HotelRepository hotelRepository;
+
+    public List<RoomTypeResponse> getAllRoomTypes() {
+
+        return roomTypeRepository.findAll().stream()
+                .map(RoomTypeResponse::from)
+                .collect(Collectors.toList());
+    }
+
+    @Transactional
+    public RoomTypeResponse createRoomType(RoomTypeRequest request) {
+
+        // Service
+        Hotel hotel = hotelRepository.findById(request.getHotelId())
+                .orElseThrow(() -> new CustomException(ErrorCode.HOTEL_NOT_FOUND));
+
+        // 2. RoomType 생성 및 저장
+        RoomType roomType = RoomType.builder()
+                .hotel(hotel)
+                .name(request.getName())
+                .grade(request.getGrade())
+                .basePrice(request.getBasePrice())
+                .capacity(request.getCapacity())
+                .totalCount(request.getTotalCount())
+                .build();
+
+        roomTypeRepository.save(roomType);
+
+
+        // 5. 엔티티 → 응답 DTO 변환 (password 필드 제외)
+        return RoomTypeResponse.from(roomType);
+    }
+
+}
+
