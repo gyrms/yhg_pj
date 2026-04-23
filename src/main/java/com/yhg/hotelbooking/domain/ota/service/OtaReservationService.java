@@ -56,11 +56,11 @@ public class OtaReservationService {
 
 
 
-        checkRoomInventory(request.getCheckInDate(),request.g, roomType, false);
-        checkOtaAllotment(request, roomType, false);
+        checkRoomInventory(request.getCheckInDate(),request.getCheckOutDate(), rv.getRoomType(), false);
+        checkOtaAllotment(request.getCheckInDate(),request.getCheckOutDate(), request.getOtaChannel(),rv.getRoomType(),false);
 
-        checkRoomInventory(request, roomType, true);
-        checkOtaAllotment(request, roomType, true);
+        checkRoomInventory(request.getCheckInDate(),request.getCheckOutDate(), rv.getRoomType(), true);
+        checkOtaAllotment(request.getCheckInDate(),request.getCheckOutDate(), request.getOtaChannel(),rv.getRoomType(), true);
             rv.modify(request.getCheckInDate(),request.getCheckOutDate(),request.getTotalPrice());
 
 
@@ -98,11 +98,11 @@ public class OtaReservationService {
         RoomType roomType = roomTypeRepository.findById(request.getRoomTypeId())
                 .orElseThrow(() -> new CustomException(ErrorCode.ROOM_TYPE_NOT_FOUND));
 
-        checkRoomInventory(request, roomType, false);
-        checkOtaAllotment(request, roomType, false);
+        checkRoomInventory(request.getCheckInDate(),request.getCheckOutDate(), roomType, false);
+        checkOtaAllotment(request.getCheckInDate(),request.getCheckOutDate(), request.getOtaChannel(),roomType,false);
 
-        checkRoomInventory(request, roomType, true);
-        checkOtaAllotment(request, roomType, true);
+        checkRoomInventory(request.getCheckInDate(),request.getCheckOutDate(), roomType, true);
+        checkOtaAllotment(request.getCheckInDate(),request.getCheckOutDate(), request.getOtaChannel(),roomType,true);
 
         Reservation rv = Reservation.builder()
                 .roomType(roomType)
