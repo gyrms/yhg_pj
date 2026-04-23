@@ -5,7 +5,7 @@ import lombok.Getter;
 
 @Getter
 public class HotelResponse {
-    private final long  id;
+    private final long id;
     private final String hotelName;
     private final String address;
     private final String description;

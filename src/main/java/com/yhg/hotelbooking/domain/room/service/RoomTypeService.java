@@ -87,7 +87,6 @@ public class RoomTypeService {
         otaChannelAllotmentRepository.saveAll(allotments);
 
 
-
         // 5. 엔티티 → 응답 DTO 변환 (password 필드 제외)
         return RoomTypeResponse.from(roomType);
     }

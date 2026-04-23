@@ -1,8 +1,5 @@
 package com.yhg.hotelbooking.domain.room.controller;
 
-import com.yhg.hotelbooking.domain.hotel.dto.request.HotelRequest;
-import com.yhg.hotelbooking.domain.hotel.dto.response.HotelResponse;
-import com.yhg.hotelbooking.domain.hotel.service.HotelService;
 import com.yhg.hotelbooking.domain.room.dto.request.RoomTypeRequest;
 import com.yhg.hotelbooking.domain.room.dto.response.RoomTypeResponse;
 import com.yhg.hotelbooking.domain.room.service.RoomTypeService;

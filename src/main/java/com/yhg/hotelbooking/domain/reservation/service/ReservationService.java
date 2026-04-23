@@ -49,11 +49,12 @@ public class ReservationService {
         if (rs.getCheckInDate().equals(LocalDate.now())) {
             rs.checkIn();
             return ReservationResponse.from(rs);
-        }else{
+        } else {
             throw new CustomException(ErrorCode.NOT_CHECKIN_DATE);
         }
 
     }
+
     @Transactional
     public ReservationResponse setCheckOutRs(Long rsId) {
 

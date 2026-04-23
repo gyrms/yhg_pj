@@ -8,6 +8,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.time.LocalDate;
 import java.util.Optional;
 
-public interface RoomDateInventoryRepository  extends JpaRepository<RoomDateInventory, Long> {
+public interface RoomDateInventoryRepository extends JpaRepository<RoomDateInventory, Long> {
     Optional<RoomDateInventory> findByRoomTypeAndDate(RoomType roomType, LocalDate date);
 }

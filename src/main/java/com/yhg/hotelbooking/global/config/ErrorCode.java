@@ -9,10 +9,14 @@ import org.springframework.http.HttpStatus;
 public enum ErrorCode {
     INTERNAL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "서버 오류가 발생했습니다."),
 
-    /** 잘못된 요청 파라미터 */
+    /**
+     * 잘못된 요청 파라미터
+     */
     INVALID_INPUT_VALUE(HttpStatus.BAD_REQUEST, "잘못된 입력값입니다."),
 
-    /** 잘못된 요청 파라미터 */
+    /**
+     * 잘못된 요청 파라미터
+     */
     HOTEL_ALREADY_EXISTS(HttpStatus.BAD_REQUEST, "이미 존재하는 호텔입니다"),
     HOTEL_NOT_FOUND(HttpStatus.NOT_FOUND, "존재하지 않는 호텔입니다."),
     ROOM_TYPE_NOT_FOUND(HttpStatus.NOT_FOUND, "존재하지 않는 객실 타입입니다"),
@@ -24,6 +28,7 @@ public enum ErrorCode {
 
     NOT_CHECKIN_STATUS(HttpStatus.BAD_REQUEST, "체크인 상태가 아닙니다."),
 
+    DUPLICATE_RESERVATION(HttpStatus.CONFLICT, "이미 처리된 예약 요청입니다."),
     NOT_CHECKIN_DATE(HttpStatus.BAD_REQUEST, "체크인 날짜가 아닙니다."),
     RESERVATION_NOT_FOUND(HttpStatus.NOT_FOUND, "예약을 찾을수 없습니다. 정보가 없습니다.");
 

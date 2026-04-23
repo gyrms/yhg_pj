@@ -62,7 +62,7 @@ public class Reservation {
     @Builder
     public Reservation(RoomType roomType, OtaChannel otaChannel, String guestName,
                        String guestPhone, LocalDate checkInDate, LocalDate checkOutDate,
-                       boolean lateArrival,boolean earlyCheckout,
+                       boolean lateArrival, boolean earlyCheckout,
                        Integer totalPrice) {
         this.roomType = roomType;
         this.otaChannel = otaChannel;
@@ -76,6 +76,7 @@ public class Reservation {
         this.nights = (int) ChronoUnit.DAYS.between(checkInDate, checkOutDate);
         this.status = Reservationstatus.PENDING; // 기본값
     }
+
     public void confirm() {
         this.status = Reservationstatus.CONFIRMED;
     }

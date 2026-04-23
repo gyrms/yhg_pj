@@ -17,11 +17,11 @@ public class Hotel {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     @Column(nullable = false, unique = true, length = 100)
-    private  String name;
+    private String name;
 
-    private  String address;
+    private String address;
 
-    private  String description;
+    private String description;
 
     @Builder
     public Hotel(String name, String address, String description) {

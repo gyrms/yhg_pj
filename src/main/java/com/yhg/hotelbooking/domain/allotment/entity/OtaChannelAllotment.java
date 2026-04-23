@@ -18,14 +18,14 @@ import java.time.LocalDate;
 @EntityListeners(AuditingEntityListener.class)
 public class OtaChannelAllotment {
 
-/*
-    id
-    ota_channel (Enum)
-    room_type_id (FK)
-    date
-    allotted_count   ← 10 고정
-    booked_count     ← 예약된 수
-    remaining_count  ← 남은 수*/
+    /*
+        id
+        ota_channel (Enum)
+        room_type_id (FK)
+        date
+        allotted_count   ← 10 고정
+        booked_count     ← 예약된 수
+        remaining_count  ← 남은 수*/
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -48,7 +48,7 @@ public class OtaChannelAllotment {
     private Integer remainingCount;
 
     @Builder
-    public OtaChannelAllotment(OtaChannel otaChannel,RoomType roomtype, LocalDate date) {
+    public OtaChannelAllotment(OtaChannel otaChannel, RoomType roomtype, LocalDate date) {
         this.otaChannel = otaChannel;
         this.roomtype = roomtype;
         this.date = date;

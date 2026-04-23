@@ -7,7 +7,7 @@ import lombok.Getter;
 
 public class RoomTypeResponse {
 
-    private final long  id;
+    private final long id;
     private final String hotelName;
     private final String name;
     private final RoomGrade grade;

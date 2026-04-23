@@ -2,6 +2,7 @@ package com.yhg.hotelbooking.domain.ota.entity;
 
 import com.yhg.hotelbooking.domain.otachannel.entity.OtaChannel;
 import com.yhg.hotelbooking.domain.reservation.entity.Reservation;
+import com.yhg.hotelbooking.domain.reservation.entity.Reservationstatus;
 import com.yhg.hotelbooking.domain.room.entity.RoomType;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
@@ -54,12 +55,26 @@ public class OtaRequestLog {
 
     @Builder
     public OtaRequestLog(OtaChannel otaChannel, String otaReservationId,
-                         Reservation reservation, RequestType requestType) {
+                         Reservation reservation) {
         this.otaChannel = otaChannel;
         this.otaReservationId = otaReservationId;
         this.reservation = reservation;
-        this.requestType = requestType;
+        this.requestType = RequestType.CREATE;
     }
+
+    public void create() {
+        this.requestType = RequestType.CREATE;
+    }
+
+    public void modify() {
+        this.requestType = RequestType.MODIFY;
+    }
+
+    public void cancel() {
+        this.requestType = RequestType.CANCEL;
+    }
+
+}
 }
 
 
