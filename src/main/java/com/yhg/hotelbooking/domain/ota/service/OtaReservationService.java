@@ -33,32 +33,34 @@ public class OtaReservationService {
     private final OtaChannelAllotmentRepository otaChannelAllotmentRepository;
     private final ReservationRepository reservationRepository;
 
-    public OtaReservationResponse confirm(Long otaResId) {
 
-        OtaRequestLog otaRequestLog = otaRequestLogRepository.findById(otaResId).orElseThrow(() -> new CustomException(ErrorCode.HOTEL_NOT_FOUND));
+
+    public void delete(String otaResId) {
+
+        OtaRequestLog otaRequestLog = otaRequestLogRepository.findByOtaReservationId(otaResId).orElseThrow(() -> new CustomException(ErrorCode.RESERVATION_NOT_FOUND));
+        Reservation rv = otaRequestLog.getReservation();
+        rv.cancel();
+        setRecoverRoomInventory(rv,rv.getRoomType());
+        setRecoverRoomOtaAllotment(rv,rv.getRoomType());
+
+    }
+
+
+    public OtaReservationResponse confirm(String otaResId) {
+
+        OtaRequestLog otaRequestLog = otaRequestLogRepository.findByOtaReservationId(otaResId).orElseThrow(() -> new CustomException(ErrorCode.RESERVATION_NOT_FOUND));
         Reservation rv = otaRequestLog.getReservation();
 
         if (rv.getStatus() != Reservationstatus.PENDING) {
             throw new CustomException(ErrorCode.NOT_CONFIRMABLE_STATUS);
         }
-
         rv.confirm();
-
         return OtaReservationResponse.from(rv, otaRequestLog.getOtaReservationId());
-
-     /*   1. otaReservationId 로 예약 조회
-          ↓
-        2. 상태가 PENDING 인지 확인
-          ↓
-        3. CONFIRMED 로 변경
-          ↓
-        4. OtaRequestLog 기록 (CONFIRM)*/
-
     }
     public OtaReservationResponse createReservation(OtaReservationRequest request) {
         // 1. 멱등성 확인
         if (otaRequestLogRepository.existsByOtaChannelAndOtaReservationId(request.getOtaChannel(), request.getOtaReservationId())) {
-            throw new CustomException(ErrorCode.HOTEL_ALREADY_EXISTS);
+            throw new CustomException(ErrorCode.RESERVATION_NOT_FOUND);
         }
 
         // 2. RoomType 조회
@@ -95,33 +97,18 @@ public class OtaReservationService {
 
     }
 
-    public void setDeleteReservation(Long otaResId) {
+    public void setDeleteReservation(String otaResId) {
 
-        OtaRequestLog otaRequestLog = otaRequestLogRepository.findById(otaResId).orElseThrow(() -> new CustomException(ErrorCode.HOTEL_NOT_FOUND));
+        OtaRequestLog otaRequestLog = otaRequestLogRepository.findByOtaReservationId(otaResId).orElseThrow(() -> new CustomException(ErrorCode.HOTEL_NOT_FOUND));
 
         Reservation rv = otaRequestLog.getReservation();
         rv.cancel();
 
-        RoomType roomType = roomTypeRepository.findById(rv.getRoomType().getId())
-                .orElseThrow(() -> new CustomException(ErrorCode.ROOM_TYPE_NOT_FOUND));
+        RoomType roomType = rv.getRoomType();
 
-        for (LocalDate date = rv.getCheckInDate(); date.isBefore(rv.getCheckOutDate()); date = date.plusDays(1)) {
-            RoomDateInventory rdi = roomDateInventoryRepository
-                    .findByRoomTypeAndDate(roomType, date)
-                    .orElseThrow(() -> new CustomException(ErrorCode.INVENTORY_NOT_FOUND));
+        setRecoverRoomInventory(rv,roomType);
 
-            rdi.restore();
-
-        }
-
-        for (LocalDate date = rv.getCheckInDate(); date.isBefore(rv.getCheckOutDate()); date = date.plusDays(1)) {
-            OtaChannelAllotment ota = otaChannelAllotmentRepository
-                    .findByOtaChannelAndRoomTypeAndDate(rv.getOtaChannel(), roomType, date)
-                    .orElseThrow(() -> new CustomException(ErrorCode.ALLOTMENT_NOT_FOUND));
-
-            ota.cancel();
-
-        }
+        setRecoverRoomOtaAllotment(rv,roomType);
 
     }
 
@@ -159,4 +146,24 @@ public class OtaReservationService {
         }
 
     }
+
+    private void setRecoverRoomInventory(Reservation rv, RoomType roomType) {
+        for (LocalDate date = rv.getCheckInDate(); date.isBefore(rv.getCheckOutDate()); date = date.plusDays(1)) {
+            RoomDateInventory rdi = roomDateInventoryRepository
+                    .findByRoomTypeAndDate(roomType, date)
+                    .orElseThrow(() -> new CustomException(ErrorCode.INVENTORY_NOT_FOUND));
+            rdi.restore();
+        }
+    }
+    private void setRecoverRoomOtaAllotment(Reservation rv, RoomType roomType) {
+        for (LocalDate date = rv.getCheckInDate(); date.isBefore(rv.getCheckOutDate()); date = date.plusDays(1)) {
+            OtaChannelAllotment ota = otaChannelAllotmentRepository
+                    .findByOtaChannelAndRoomTypeAndDate(rv.getOtaChannel(), roomType, date)
+                    .orElseThrow(() -> new CustomException(ErrorCode.ALLOTMENT_NOT_FOUND));
+
+            ota.cancel();
+        }
+    }
+
+
 }

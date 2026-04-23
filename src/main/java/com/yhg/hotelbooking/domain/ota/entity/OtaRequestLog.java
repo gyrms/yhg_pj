@@ -2,8 +2,6 @@ package com.yhg.hotelbooking.domain.ota.entity;
 
 import com.yhg.hotelbooking.domain.otachannel.entity.OtaChannel;
 import com.yhg.hotelbooking.domain.reservation.entity.Reservation;
-import com.yhg.hotelbooking.domain.reservation.entity.Reservationstatus;
-import com.yhg.hotelbooking.domain.room.entity.RoomType;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;

@@ -1,12 +1,8 @@
 package com.yhg.hotelbooking.domain.ota.controller;
 
-import com.yhg.hotelbooking.domain.hotel.dto.request.HotelRequest;
-import com.yhg.hotelbooking.domain.hotel.dto.response.HotelResponse;
-import com.yhg.hotelbooking.domain.hotel.service.HotelService;
 import com.yhg.hotelbooking.domain.ota.dto.request.OtaReservationRequest;
 import com.yhg.hotelbooking.domain.ota.dto.response.OtaReservationResponse;
 import com.yhg.hotelbooking.domain.ota.service.OtaReservationService;
-import com.yhg.hotelbooking.domain.reservation.dto.response.CheckInResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -17,23 +13,29 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 public class OtaReservationController {
 
-    private final OtaReservationService otareservationservice;
+    private final OtaReservationService otaReservationService;
 
     @PostMapping
     public ResponseEntity<OtaReservationResponse> createReservation(@Valid @RequestBody OtaReservationRequest request) {
-        OtaReservationResponse response = otareservationservice.createReservation(request);
+        OtaReservationResponse response = otaReservationService.createReservation(request);
         return ResponseEntity.ok(response);
     }
 
     @DeleteMapping("/{otaResId}")
-    public ResponseEntity<Void> setDeleteReservation(@PathVariable("otaResId") Long otaResId) {
-        otareservationservice.setDeleteReservation(otaResId);
+    public ResponseEntity<Void> setDeleteReservation(@PathVariable("otaResId") String otaResId) {
+        otaReservationService.setDeleteReservation(otaResId);
         return ResponseEntity.noContent().build();
     }
 
     @PostMapping("/{otaResId}/confirm")
-    public ResponseEntity<OtaReservationResponse> confirm(@PathVariable("otaResId") Long otaResId) {
-        OtaReservationResponse response = otareservationservice.confirm(otaResId);
+    public ResponseEntity<OtaReservationResponse> confirm(@PathVariable("otaResId") String otaResId) {
+        OtaReservationResponse response = otaReservationService.confirm(otaResId);
         return ResponseEntity.ok(response);
+    }
+
+    @DeleteMapping("/{otaResId}")
+    public ResponseEntity<OtaReservationResponse> Delete(@PathVariable("otaResId") String otaResId) {
+        otaReservationService.delete(otaResId);
+        return ResponseEntity.noContent().build();
     }
 }
