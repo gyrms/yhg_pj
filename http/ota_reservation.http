@@ -1,5 +1,9 @@
-### OTA 예약 요청 수신 (야놀자)
-### 순서: 호텔 등록 → 객실 타입 등록 → 이 요청 실행
+### ================================================================
+### STEP 3. OTA 예약 생성
+### 실행 순서: hotel.http → room_type.http → 여기
+### ================================================================
+
+### [야놀자] 예약 생성 (2박)
 POST http://localhost:8080/api/ota/reservations
 Content-Type: application/json
 
@@ -16,7 +20,7 @@ Content-Type: application/json
 
 ###
 
-### OTA 예약 요청 수신 (여기어때)
+### [여기어때] 예약 생성 (1박)
 POST http://localhost:8080/api/ota/reservations
 Content-Type: application/json
 
@@ -33,7 +37,7 @@ Content-Type: application/json
 
 ###
 
-### OTA 예약 요청 수신 (요기서)
+### [요기서] 예약 생성 (2박)
 POST http://localhost:8080/api/ota/reservations
 Content-Type: application/json
 
@@ -50,19 +54,44 @@ Content-Type: application/json
 
 ###
 
-### OTA 예약 확정 (otaReservationId로 확정)
+### ================================================================
+### STEP 4. OTA 예약 확정 (PENDING → CONFIRMED)
+### ================================================================
+
 POST http://localhost:8080/api/ota/reservations/YANOLJA-RES-001/confirm
 Content-Type: application/json
 
 ###
 
-### OTA 예약 취소 (otaReservationId로 취소 + 재고 원복)
+### ================================================================
+### STEP 5. OTA 예약 수정 (날짜/금액 변경)
+### 확정 전(PENDING) or 확정 후(CONFIRMED) 모두 가능
+### ================================================================
+
+PUT http://localhost:8080/api/ota/reservations/YANOLJA-RES-001
+Content-Type: application/json
+
+{
+  "checkInDate": "2026-05-05",
+  "checkOutDate": "2026-05-07",
+  "totalPrice": 250000
+}
+
+###
+
+### ================================================================
+### STEP 6. OTA 예약 취소 (재고 자동 원복)
+### ================================================================
+
 DELETE http://localhost:8080/api/ota/reservations/YANOLJA-RES-001
 Content-Type: application/json
 
 ###
 
-### 멱등성 테스트 - 동일 요청 재전송 (DUPLICATE_RESERVATION 에러 확인)
+### ================================================================
+### 멱등성 테스트 - 중복 요청 (DUPLICATE_RESERVATION 에러 확인)
+### ================================================================
+
 POST http://localhost:8080/api/ota/reservations
 Content-Type: application/json
 

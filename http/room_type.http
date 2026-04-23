@@ -1,11 +1,10 @@
-### 객실 타입 전체 조회
-GET http://localhost:8080/api/room-types
-Content-Type: application/json
+### ================================================================
+### STEP 2. 객실 타입 등록 (호텔 등록 후 실행)
+### 등록 시 자동 생성:
+###   - RoomDateInventory (오늘~90일치, 21개)
+###   - OtaChannelAllotment (야놀자/여기어때/요기서 각 10개)
+### ================================================================
 
-###
-
-### 객실 타입 등록 (호텔 등록 후 실행 - hotelId 확인 필요)
-### 등록 시 날짜별 재고(RoomDateInventory), OTA 할당 재고(OtaChannelAllotment) 자동 생성
 POST http://localhost:8080/api/room-types
 Content-Type: application/json
 
@@ -17,3 +16,9 @@ Content-Type: application/json
   "capacity": 2,
   "totalCount": 21
 }
+
+###
+
+### 객실 타입 전체 조회
+GET http://localhost:8080/api/room-types
+Content-Type: application/json
