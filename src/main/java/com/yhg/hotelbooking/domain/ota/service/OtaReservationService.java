@@ -10,6 +10,7 @@ import com.yhg.hotelbooking.domain.ota.dto.response.OtaReservationResponse;
 import com.yhg.hotelbooking.domain.ota.entity.OtaRequestLog;
 import com.yhg.hotelbooking.domain.ota.entity.RequestType;
 import com.yhg.hotelbooking.domain.ota.repository.OtaRequestLogRepository;
+import com.yhg.hotelbooking.domain.otachannel.entity.OtaChannel;
 import com.yhg.hotelbooking.domain.reservation.entity.Reservation;
 import com.yhg.hotelbooking.domain.reservation.entity.Reservationstatus;
 import com.yhg.hotelbooking.domain.reservation.repository.ReservationRepository;
@@ -47,23 +48,24 @@ public class OtaReservationService {
         OtaRequestLog otaRequestLog = otaRequestLogRepository.findByOtaReservationId(otaResId).orElseThrow(() -> new CustomException(ErrorCode.RESERVATION_NOT_FOUND));
         Reservation rv = otaRequestLog.getReservation();
 
-        if (rv.getStatus() == Reservationstatus.PENDING || rv.getStatus() == Reservationstatus.CONFIRMED) {
-
-            setRecoverRoomInventory(rv,rv.getRoomType());
-
-            for (LocalDate date = rv.getCheckInDate(); date.isBefore(rv.getCheckOutDate()); date = date.plusDays(1)) {
-                RoomDateInventory rdi = roomDateInventoryRepository
-                        .findByRoomTypeAndDate(rv.getRoomType(), date)
-                        .orElseThrow(() -> new CustomException(ErrorCode.INVENTORY_NOT_FOUND));
-
-                    rdi.book();
-
-            }
-            rv.modify(request.getCheckInDate(),request.getCheckOutDate(),request.getTotalPrice());
-            return OtaReservationResponse.from(rv, otaRequestLog.getOtaReservationId());
-        }else{
+        if (rv.getStatus() == Reservationstatus.CANCELLED) {
             throw new CustomException(ErrorCode.CAN_NOT_CHANGE_CONFIRMABLE_STATUS);
         }
+            setRecoverRoomInventory(rv,rv.getRoomType());
+            setRecoverRoomOtaAllotment(rv,rv.getRoomType());
+
+
+
+        checkRoomInventory(request.getCheckInDate(),request.g, roomType, false);
+        checkOtaAllotment(request, roomType, false);
+
+        checkRoomInventory(request, roomType, true);
+        checkOtaAllotment(request, roomType, true);
+            rv.modify(request.getCheckInDate(),request.getCheckOutDate(),request.getTotalPrice());
+
+
+            return OtaReservationResponse.from(rv, otaRequestLog.getOtaReservationId());
+
     }
 
     public void delete(String otaResId) {
@@ -125,10 +127,10 @@ public class OtaReservationService {
 
     }
 
-    private void checkRoomInventory(OtaReservationRequest request, RoomType roomType, boolean isplay) {
+    private void checkRoomInventory(LocalDate checkin,LocalDate checkout, RoomType roomType, boolean isplay) {
 
         // 5. 실제 재고 차감
-        for (LocalDate date = request.getCheckInDate(); date.isBefore(request.getCheckOutDate()); date = date.plusDays(1)) {
+        for (LocalDate date = checkin; date.isBefore(checkout); date = date.plusDays(1)) {
             RoomDateInventory rdi = roomDateInventoryRepository
                     .findByRoomTypeAndDate(roomType, date)
                     .orElseThrow(() -> new CustomException(ErrorCode.INVENTORY_NOT_FOUND));
@@ -142,11 +144,11 @@ public class OtaReservationService {
         }
     }
 
-    private void checkOtaAllotment(OtaReservationRequest request, RoomType roomType, boolean isplay) {
+    private void checkOtaAllotment(LocalDate checkin, LocalDate checkout, OtaChannel otaChannel, RoomType roomType, boolean isplay) {
 
-        for (LocalDate date = request.getCheckInDate(); date.isBefore(request.getCheckOutDate()); date = date.plusDays(1)) {
+        for (LocalDate date = checkin; date.isBefore(checkout); date = date.plusDays(1)) {
             OtaChannelAllotment ota = otaChannelAllotmentRepository
-                    .findByOtaChannelAndRoomTypeAndDate(request.getOtaChannel(), roomType, date)
+                    .findByOtaChannelAndRoomTypeAndDate(otaChannel, roomType, date)
                     .orElseThrow(() -> new CustomException(ErrorCode.ALLOTMENT_NOT_FOUND));
             if (isplay) {
                 ota.book();
