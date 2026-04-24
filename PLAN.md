@@ -165,6 +165,55 @@ POST   /api/ota/reservations/{otaResId}/confirm - 예약 확정
 응답: 성공 / 재고부족(실제) / 할당소진(OTA) 구분
 ```
 
+### 현황 조회 (ADMIN) ★
+```
+GET  /api/dashboard                          - 전체 현황 요약
+GET  /api/room-types/status?date=2026-05-01  - 룸타입별 당일 재고 현황
+```
+
+**GET /api/dashboard 응답 예시**
+```json
+{
+  "totalRoomTypes": 3,
+  "reservationSummary": {
+    "total": 10,
+    "PENDING": 3,
+    "CONFIRMED": 5,
+    "CHECKED_IN": 2,
+    "CANCELLED": 0
+  },
+  "reservations": [
+    {
+      "id": 1,
+      "otaChannel": "YANOLJA",
+      "guestName": "홍길동",
+      "checkInDate": "2026-05-01",
+      "checkOutDate": "2026-05-03",
+      "status": "CONFIRMED"
+    }
+  ]
+}
+```
+
+**GET /api/room-types/status?date=2026-05-01 응답 예시**
+```json
+[
+  {
+    "roomTypeId": 1,
+    "name": "스탠다드룸",
+    "grade": "STANDARD",
+    "totalCount": 15,
+    "bookedCount": 7,
+    "availableCount": 8,
+    "otaAllotment": [
+      { "channel": "YANOLJA",  "remaining": 3 },
+      { "channel": "YEOGI",    "remaining": 5 },
+      { "channel": "YOGISEO",  "remaining": 10 }
+    ]
+  }
+]
+```
+
 ### 통계 / 판매 현황 ★
 ```
 GET  /api/stats/daily?date=2026-05-01
