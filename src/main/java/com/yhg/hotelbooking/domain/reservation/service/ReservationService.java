@@ -110,13 +110,14 @@ public class ReservationService {
         }
 
         for (LocalDate date = LocalDate.now().plusDays(1); date.isBefore(rs.getCheckOutDate()); date =date.plusDays(1)) {
-            RoomDateInventory roomDateInventory=   roomDateInventoryRepository.findByRoomTypeAndDate(rs.getRoomType(),date)
-                    .orElseThrow(()-> new CustomException(ErrorCode.RESERVATION_NOT_FOUND));
-            roomDateInventory.restore();
 
-            OtaChannelAllotment otaChannelAllotment= otaChannelAllotmentRepository.findByOtaChannelAndRoomTypeAndDate(rs.getOtaChannel(), rs.getRoomType(), date)
-                    .orElseThrow(()-> new CustomException(ErrorCode.ALLOTMENT_NOT_FOUND));
-            otaChannelAllotment.cancel();
+            roomDateInventoryRepository.findByRoomTypeAndDate(rs.getRoomType(), date)
+                    .orElseThrow(() -> new CustomException(ErrorCode.RESERVATION_NOT_FOUND))
+                    .restore();
+
+            otaChannelAllotmentRepository.findByOtaChannelAndRoomTypeAndDate(rs.getOtaChannel(), rs.getRoomType(), date)
+                    .orElseThrow(()-> new CustomException(ErrorCode.ALLOTMENT_NOT_FOUND))
+            .cancel();
         }
 
         rs.earlyCheckout();
