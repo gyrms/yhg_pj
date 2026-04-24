@@ -2,7 +2,9 @@ package com.yhg.hotelbooking.domain.room.dto.response;
 
 import com.yhg.hotelbooking.domain.room.entity.RoomGrade;
 import com.yhg.hotelbooking.domain.room.entity.RoomType;
+import lombok.Getter;
 
+@Getter
 public class RoomTypeResponse {
 
     private final long id;
