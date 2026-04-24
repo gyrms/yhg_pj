@@ -20,7 +20,7 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
     Optional<Reservation> findConfirmedById(@Param("rsId") Long rsId);
 
     @Query("SELECT DISTINCT r FROM Reservation r " +
-            "WHERE r.checkOutDate = :date "+
+            "WHERE r.checkInDate = :date "+
             "AND r.status = 'CONFIRMED' " +
             "AND r.lateArrival = false")
     List<Reservation> findCheckoutDataToday(@Param("date") LocalDate date);
