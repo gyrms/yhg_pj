@@ -8,7 +8,6 @@ import java.time.LocalDate;
 @Getter
 @NoArgsConstructor
 public class OtaModifyRequest {
-   // private OtaChannel otaChannel;
     private LocalDate checkInDate;
     private LocalDate checkOutDate;
     private Integer totalPrice;

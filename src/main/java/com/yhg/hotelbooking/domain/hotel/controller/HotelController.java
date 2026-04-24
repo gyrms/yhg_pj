@@ -4,7 +4,6 @@ import com.yhg.hotelbooking.domain.hotel.dto.request.HotelRequest;
 import com.yhg.hotelbooking.domain.hotel.dto.response.HotelResponse;
 import com.yhg.hotelbooking.domain.hotel.service.HotelService;
 import jakarta.validation.Valid;
-import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;

@@ -1,7 +1,5 @@
 package com.yhg.hotelbooking.domain.reservation.dto.response;
 
-import com.yhg.hotelbooking.domain.hotel.dto.response.HotelResponse;
-import com.yhg.hotelbooking.domain.hotel.entity.Hotel;
 import com.yhg.hotelbooking.domain.reservation.entity.Reservation;
 import lombok.Getter;
 

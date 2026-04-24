@@ -1,7 +1,5 @@
 package com.yhg.hotelbooking.domain.reservation.service;
 
-import com.yhg.hotelbooking.domain.hotel.dto.response.HotelResponse;
-import com.yhg.hotelbooking.domain.hotel.repository.HotelRepository;
 import com.yhg.hotelbooking.domain.reservation.dto.response.CheckInResponse;
 import com.yhg.hotelbooking.domain.reservation.dto.response.ReservationResponse;
 import com.yhg.hotelbooking.domain.reservation.entity.Reservation;
@@ -58,7 +56,7 @@ public class ReservationService {
     @Transactional
     public ReservationResponse setCheckOutRs(Long rsId) {
 
-        Reservation rs = reservationRepository.findById(rsId).orElseThrow(() -> new CustomException(ErrorCode.HOTEL_NOT_FOUND));
+        Reservation rs = reservationRepository.findById(rsId).orElseThrow(() -> new CustomException(ErrorCode.RESERVATION_NOT_FOUND));
 
         if (rs.getStatus() != Reservationstatus.CHECKED_IN) {
             throw new CustomException(ErrorCode.NOT_CHECKIN_STATUS);
@@ -74,7 +72,7 @@ public class ReservationService {
 
     @Transactional
     public void deleteRs(Long rsId) {
-        Reservation rs = reservationRepository.findById(rsId).orElseThrow(() -> new CustomException(ErrorCode.HOTEL_NOT_FOUND));
+        Reservation rs = reservationRepository.findById(rsId).orElseThrow(() -> new CustomException(ErrorCode.RESERVATION_NOT_FOUND));
         if (rs.getStatus() != Reservationstatus.PENDING) {
             throw new CustomException(ErrorCode.NOT_DELETE_STATUS);
         }
