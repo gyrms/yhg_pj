@@ -108,13 +108,16 @@ public class ReservationService {
         if (rs.getStatus() != Reservationstatus.CHECKED_IN) {
             throw new CustomException(ErrorCode.NOT_CHECKIN_STATUS);
         }
-        RoomDateInventory roomDateInventory=   roomDateInventoryRepository.findByRoomTypeAndDate(rs.getRoomType(),LocalDate.now())
-                .orElseThrow(()-> new CustomException(ErrorCode.RESERVATION_NOT_FOUND));
-         roomDateInventory.restore();
 
-        OtaChannelAllotment otaChannelAllotment= otaChannelAllotmentRepository.findByOtaChannelAndRoomTypeAndDate(rs.getOtaChannel(), rs.getRoomType(), LocalDate.now())
-                .orElseThrow(()-> new CustomException(ErrorCode.ALLOTMENT_NOT_FOUND));
-        otaChannelAllotment.cancel();
+        for (LocalDate date = LocalDate.now().plusDays(1); date.isBefore(rs.getCheckOutDate()); date =date.plusDays(1)) {
+            RoomDateInventory roomDateInventory=   roomDateInventoryRepository.findByRoomTypeAndDate(rs.getRoomType(),date)
+                    .orElseThrow(()-> new CustomException(ErrorCode.RESERVATION_NOT_FOUND));
+            roomDateInventory.restore();
+
+            OtaChannelAllotment otaChannelAllotment= otaChannelAllotmentRepository.findByOtaChannelAndRoomTypeAndDate(rs.getOtaChannel(), rs.getRoomType(), date)
+                    .orElseThrow(()-> new CustomException(ErrorCode.ALLOTMENT_NOT_FOUND));
+            otaChannelAllotment.cancel();
+        }
 
         rs.earlyCheckout();
 
