@@ -5,7 +5,7 @@
 ###   - OtaChannelAllotment (야놀자/여기어때/요기서 각 10개)
 ### ================================================================
 
-### [스탠다드룸] 15개
+### [스탠다드룸] 12개
 POST http://localhost:8080/api/room-types
 Content-Type: application/json
 
@@ -34,7 +34,7 @@ Content-Type: application/json
 
 ###
 
-### [스위트룸] 2개
+### [스위트룸] 5개
 POST http://localhost:8080/api/room-types
 Content-Type: application/json
 
@@ -44,7 +44,7 @@ Content-Type: application/json
 "grade": "SUITE",
 "basePrice": 300000,
 "capacity": 4,
-"totalCount": 2
+"totalCount": 5
 }
 
 
@@ -55,6 +55,6 @@ GET http://localhost:8080/api/room-types
 Content-Type: application/json
 
 ### 객실 상황 날짜로 조회
- GET http://localhost:8080/api/room-types/status?date=2026-04-24
+ GET http://localhost:8080/api/room-types/status?date=2026-05-02
 
 

@@ -35,7 +35,9 @@ public class DashboardService {
         ReservationSummary summary = ReservationSummary.builder()
                 .total(all.size())
                 .pending(all.stream().filter(r -> r.getStatus() == Reservationstatus.PENDING).count())
-                // 나머지 직접 채워봐
+                .confirmed(all.stream().filter(r -> r.getStatus() == Reservationstatus.CONFIRMED).count())
+                .checkedIn(all.stream().filter(r -> r.getStatus() == Reservationstatus.CHECKED_IN).count())
+                .cancelled(all.stream().filter(r -> r.getStatus() == Reservationstatus.CANCELLED).count())
                 .build();
 
         List<ReservationResponse> reservations = all.stream()
