@@ -10,4 +10,7 @@ import java.util.Optional;
 
 public interface RoomDateInventoryRepository extends JpaRepository<RoomDateInventory, Long> {
     Optional<RoomDateInventory> findByRoomTypeAndDate(RoomType roomType, LocalDate date);
+
+
+
 }

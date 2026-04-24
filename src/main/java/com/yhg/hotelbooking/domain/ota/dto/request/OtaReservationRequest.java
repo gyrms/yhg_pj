@@ -2,6 +2,8 @@ package com.yhg.hotelbooking.domain.ota.dto.request;
 
 import com.yhg.hotelbooking.domain.otachannel.entity.OtaChannel;
 import com.yhg.hotelbooking.domain.reservation.entity.Reservation;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -9,6 +11,9 @@ import java.time.LocalDate;
 
 @Getter
 @NoArgsConstructor
+@AllArgsConstructor
+@Builder
+
 public class OtaReservationRequest {
     private OtaChannel otaChannel;
     private String otaReservationId;
