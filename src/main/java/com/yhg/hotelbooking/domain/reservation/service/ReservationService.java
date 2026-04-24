@@ -1,10 +1,16 @@
 package com.yhg.hotelbooking.domain.reservation.service;
 
+import com.yhg.hotelbooking.domain.allotment.entity.OtaChannelAllotment;
+import com.yhg.hotelbooking.domain.allotment.repository.OtaChannelAllotmentRepository;
+import com.yhg.hotelbooking.domain.inventory.entity.RoomDateInventory;
+import com.yhg.hotelbooking.domain.inventory.repository.RoomDateInventoryRepository;
+import com.yhg.hotelbooking.domain.otachannel.entity.OtaChannel;
 import com.yhg.hotelbooking.domain.reservation.dto.response.CheckInResponse;
 import com.yhg.hotelbooking.domain.reservation.dto.response.ReservationResponse;
 import com.yhg.hotelbooking.domain.reservation.entity.Reservation;
 import com.yhg.hotelbooking.domain.reservation.entity.Reservationstatus;
 import com.yhg.hotelbooking.domain.reservation.repository.ReservationRepository;
+import com.yhg.hotelbooking.domain.room.entity.RoomType;
 import com.yhg.hotelbooking.global.config.CustomException;
 import com.yhg.hotelbooking.global.config.ErrorCode;
 import lombok.RequiredArgsConstructor;
@@ -13,6 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -21,7 +28,8 @@ import java.util.stream.Collectors;
 public class ReservationService {
 
     private final ReservationRepository reservationRepository;
-
+    private final RoomDateInventoryRepository roomDateInventoryRepository;
+    private final OtaChannelAllotmentRepository otaChannelAllotmentRepository;
     public List<ReservationResponse> getAllRs() {
         return reservationRepository.findAll().stream()
                 .map(ReservationResponse::from)
@@ -79,5 +87,38 @@ public class ReservationService {
         reservationRepository.deleteById(rsId);
     }
 
+    @Transactional
+    public ReservationResponse lateArrival(Long rsId) {
+
+        Reservation rs = reservationRepository.findById(rsId).orElseThrow(() -> new CustomException(ErrorCode.RESERVATION_NOT_FOUND));
+
+        if (rs.getStatus() != Reservationstatus.CONFIRMED) {
+            throw new CustomException(ErrorCode.NOT_CHECKIN_STATUS);
+        }
+        rs.setlateArrival();
+
+        return ReservationResponse.from(rs);
+    }
+
+    @Transactional
+    public ReservationResponse earlyCheckout(Long rsId) {
+
+        Reservation rs = reservationRepository.findById(rsId).orElseThrow(() -> new CustomException(ErrorCode.RESERVATION_NOT_FOUND));
+
+        if (rs.getStatus() != Reservationstatus.CHECKED_IN) {
+            throw new CustomException(ErrorCode.NOT_CHECKIN_STATUS);
+        }
+        RoomDateInventory roomDateInventory=   roomDateInventoryRepository.findByRoomTypeAndDate(rs.getRoomType(),LocalDate.now())
+                .orElseThrow(()-> new CustomException(ErrorCode.RESERVATION_NOT_FOUND));
+         roomDateInventory.restore();
+
+        OtaChannelAllotment otaChannelAllotment= otaChannelAllotmentRepository.findByOtaChannelAndRoomTypeAndDate(rs.getOtaChannel(), rs.getRoomType(), LocalDate.now())
+                .orElseThrow(()-> new CustomException(ErrorCode.ALLOTMENT_NOT_FOUND));
+        otaChannelAllotment.cancel();
+
+        rs.earlyCheckout();
+
+        return ReservationResponse.from(rs);
+    }
 
 }

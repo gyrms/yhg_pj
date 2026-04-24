@@ -1,7 +1,5 @@
 package com.yhg.hotelbooking.domain.inventory.entity;
 
-import com.yhg.hotelbooking.domain.hotel.entity.Hotel;
-import com.yhg.hotelbooking.domain.room.entity.RoomGrade;
 import com.yhg.hotelbooking.domain.room.entity.RoomType;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
@@ -11,7 +9,6 @@ import lombok.NoArgsConstructor;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "roomdateinventory")
@@ -19,13 +16,6 @@ import java.time.LocalDateTime;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @EntityListeners(AuditingEntityListener.class)
 public class RoomDateInventory {
-  /*  id
-    room_type_id (FK)
-    date
-    total_count      ← 21 고정
-    booked_count     ← 예약된 수
-    available_count  ← 남은 수 (total - booked)
-    version          ← 낙관적 락용 (Phase 3)*/
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

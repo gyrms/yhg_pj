@@ -100,5 +100,13 @@ public class Reservation {
         this.nights = (int) ChronoUnit.DAYS.between(checkInDate, checkOutDate);
     }
 
+    public void setlateArrival () {
+        this.lateArrival = true;
+    }
+    public void earlyCheckout() {
+        this.earlyCheckout = true;
+        this.status = Reservationstatus.CHECKED_OUT;
+    }
+
 }
 

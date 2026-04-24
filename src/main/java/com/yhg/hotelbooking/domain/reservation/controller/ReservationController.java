@@ -49,4 +49,16 @@ public class ReservationController {
         reservationService.deleteRs(rsId);
         return ResponseEntity.noContent().build();
     }
+
+    @PostMapping("/{id}/late-arrival")
+    public ResponseEntity<ReservationResponse> lateArrival(@PathVariable("id") Long rsId) {
+        ReservationResponse response = reservationService.lateArrival(rsId);
+        return ResponseEntity.ok(response);
+    }
+
+    @PostMapping("/{id}/early-checkout")
+    public ResponseEntity<ReservationResponse> earlyCheckout(@PathVariable("id") Long rsId) {
+        ReservationResponse response = reservationService.earlyCheckout(rsId);
+        return ResponseEntity.ok(response);
+    }
 }
