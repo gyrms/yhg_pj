@@ -5,17 +5,48 @@
 ###   - OtaChannelAllotment (야놀자/여기어때/요기서 각 10개)
 ### ================================================================
 
+### [스탠다드룸] 15개
 POST http://localhost:8080/api/room-types
 Content-Type: application/json
 
 {
-  "hotelId": 1,
-  "name": "스탠다드룸",
-  "grade": "STANDARD",
-  "basePrice": 100000,
-  "capacity": 2,
-  "totalCount": 21
+"hotelId": 1,
+"name": "스탠다드룸",
+"grade": "STANDARD",
+"basePrice": 100000,
+"capacity": 2,
+"totalCount": 15
 }
+
+
+### [디럭스룸] 4개
+POST http://localhost:8080/api/room-types
+Content-Type: application/json
+
+{
+"hotelId": 1,
+"name": "디럭스룸",
+"grade": "DELUXE",
+"basePrice": 150000,
+"capacity": 2,
+"totalCount": 4
+}
+
+###
+
+### [스위트룸] 2개
+POST http://localhost:8080/api/room-types
+Content-Type: application/json
+
+{
+"hotelId": 1,
+"name": "스위트룸",
+"grade": "SUITE",
+"basePrice": 300000,
+"capacity": 4,
+"totalCount": 2
+}
+
 
 ###
 
