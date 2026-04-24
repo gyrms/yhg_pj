@@ -93,6 +93,10 @@ public class Reservation {
         this.status = Reservationstatus.CHECKED_OUT;
     }
 
+    public void noShow() {
+        this.status = Reservationstatus.NO_SHOW;
+    }
+
     public void modify(LocalDate checkInDate, LocalDate checkOutDate, Integer totalPrice) {
         this.checkInDate = checkInDate;
         this.checkOutDate = checkOutDate;

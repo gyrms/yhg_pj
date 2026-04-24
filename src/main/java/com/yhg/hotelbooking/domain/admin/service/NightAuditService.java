@@ -1,11 +1,10 @@
 package com.yhg.hotelbooking.domain.admin.service;
 
 import com.yhg.hotelbooking.domain.admin.dto.response.NightAuditResponse;
-import com.yhg.hotelbooking.domain.reservation.dto.response.ReservationResponse;
+import com.yhg.hotelbooking.domain.allotment.repository.OtaChannelAllotmentRepository;
+import com.yhg.hotelbooking.domain.inventory.repository.RoomDateInventoryRepository;
 import com.yhg.hotelbooking.domain.reservation.entity.Reservation;
 import com.yhg.hotelbooking.domain.reservation.repository.ReservationRepository;
-import com.yhg.hotelbooking.global.config.CustomException;
-import com.yhg.hotelbooking.global.config.ErrorCode;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -18,9 +17,24 @@ import java.util.List;
 public class NightAuditService {
 
     private final ReservationRepository reservationRepository;
+    private final RoomDateInventoryRepository roomDateInventoryRepository;
+    private final OtaChannelAllotmentRepository otaChannelAllotmentRepository;
 
+    @Transactional
     public NightAuditResponse findCheckoutDataToday() {
         List<Reservation> rs = reservationRepository.findCheckoutDataToday(LocalDate.now());
+
+        for (Reservation reservation : rs) {
+            // 1. NO_SHOW 변경
+            reservation.noShow();
+
+            // 2. 재고 복구 - 체크인~체크아웃 전날까지 루프
+            for (LocalDate date = reservation.getCheckInDate();date.isBefore(reservation.getCheckOutDate()); date = date.plusDays(1)) {
+                roomDateInventoryRepository.findByRoomTypeAndDate(reservation.getRoomType(), date).ifPresent(roomDateInventory -> roomDateInventory.restore());
+                otaChannelAllotmentRepository.findByOtaChannelAndRoomTypeAndDate(reservation.getOtaChannel(),reservation.getRoomType(),  date).ifPresent(otaChannelAllotment -> otaChannelAllotment.cancel());
+            }
+        }
+
         List<NightAuditResponse.NoShowReservationResponse> noShowReservations = rs.stream()
                 .map(reservation -> NightAuditResponse.NoShowReservationResponse.builder()
                         .id(reservation.getId())
