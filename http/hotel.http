@@ -6,9 +6,9 @@ POST http://localhost:8080/api/hotels
 Content-Type: application/json
 
 {
-  "name": "윤효근 호텔",
-  "address": "서울시 강남구 테헤란로 123",
-  "description": "21개 객실 보유 호텔"
+  "hotelName": "윤효근 호텔",
+  "hotelAddress": "서울시 강남구 테헤란로 123",
+  "hotelDescription": "21개 객실 보유 호텔"
 }
 
 ###
