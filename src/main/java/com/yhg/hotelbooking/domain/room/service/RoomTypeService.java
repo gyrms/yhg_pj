@@ -8,7 +8,9 @@ import com.yhg.hotelbooking.domain.inventory.entity.RoomDateInventory;
 import com.yhg.hotelbooking.domain.inventory.repository.RoomDateInventoryRepository;
 import com.yhg.hotelbooking.domain.otachannel.entity.OtaChannel;
 import com.yhg.hotelbooking.domain.room.dto.request.RoomTypeRequest;
+import com.yhg.hotelbooking.domain.room.dto.response.OtaAllotmentInfo;
 import com.yhg.hotelbooking.domain.room.dto.response.RoomTypeResponse;
+import com.yhg.hotelbooking.domain.room.dto.response.RoomTypeStatusResponse;
 import com.yhg.hotelbooking.domain.room.entity.RoomType;
 import com.yhg.hotelbooking.domain.room.repository.RoomTypeRepository;
 import com.yhg.hotelbooking.global.config.CustomException;
@@ -20,6 +22,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -88,5 +91,41 @@ public class RoomTypeService {
         return RoomTypeResponse.from(roomType);
     }
 
+    public List<RoomTypeStatusResponse> getRoomTypeStatus(LocalDate date) {
+        List<RoomType> roomList = roomTypeRepository.findAll();
+        List<RoomTypeStatusResponse> roomTypeStatusResponses = new ArrayList<>();
+
+        for (RoomType roomType : roomList) {
+            RoomDateInventory roomDateInventory = roomDateInventoryRepository.findByRoomTypeAndDate(roomType, date)
+                    .orElseThrow(()-> new CustomException(ErrorCode.RESERVATION_NOT_FOUND));
+
+            List<OtaAllotmentInfo> otaList = new ArrayList<>();
+
+            for (OtaChannel ota : OtaChannel.values()) {
+
+                OtaChannelAllotment otaChannelAllotment = otaChannelAllotmentRepository.findByOtaChannelAndRoomTypeAndDate(ota,roomType,date)
+                        .orElseThrow(()-> new CustomException(ErrorCode.RESERVATION_NOT_FOUND));
+
+                otaList.add(OtaAllotmentInfo.builder()
+                            .channel(ota.name())
+                            .remaining(otaChannelAllotment.getRemainingCount())
+                            .build());
+            }
+
+            roomTypeStatusResponses.add(RoomTypeStatusResponse.builder()
+                    .roomTypeId(roomType.getId())
+                    .name(roomType.getName())
+                    .grade(roomType.getGrade())
+                    .totalCount(roomType.getTotalCount())
+                    .bookedCount(roomDateInventory.getBookedCount())
+                    .availableCount(roomDateInventory.getAvailableCount())
+                    .otaAllotment(otaList)
+                    .build());
+        }
+
+
+      return roomTypeStatusResponses;
+
+    }
 }
 

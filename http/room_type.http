@@ -15,7 +15,7 @@ Content-Type: application/json
 "grade": "STANDARD",
 "basePrice": 100000,
 "capacity": 2,
-"totalCount": 15
+"totalCount": 12
 }
 
 
@@ -53,3 +53,8 @@ Content-Type: application/json
 ### 객실 타입 전체 조회
 GET http://localhost:8080/api/room-types
 Content-Type: application/json
+
+### 객실 상황 날짜로 조회
+ GET http://localhost:8080/api/room-types/status?date=2026-04-24
+
+

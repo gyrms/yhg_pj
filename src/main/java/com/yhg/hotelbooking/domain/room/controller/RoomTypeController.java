@@ -2,12 +2,14 @@ package com.yhg.hotelbooking.domain.room.controller;
 
 import com.yhg.hotelbooking.domain.room.dto.request.RoomTypeRequest;
 import com.yhg.hotelbooking.domain.room.dto.response.RoomTypeResponse;
+import com.yhg.hotelbooking.domain.room.dto.response.RoomTypeStatusResponse;
 import com.yhg.hotelbooking.domain.room.service.RoomTypeService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @RestController
@@ -29,4 +31,11 @@ public class RoomTypeController {
     }
 
 
+    @GetMapping("/status")
+    public ResponseEntity<List<RoomTypeStatusResponse>> getStatus(
+            @RequestParam LocalDate date) {
+
+        List<RoomTypeStatusResponse> roomTypeStatusResponses = roomTypeService.getRoomTypeStatus(date);
+        return ResponseEntity.ok(roomTypeStatusResponses);
+    }
 }

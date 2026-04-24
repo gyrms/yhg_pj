@@ -1,5 +1,6 @@
 package com.yhg.hotelbooking.domain.dashboard.controller;
 
+import com.yhg.hotelbooking.domain.dashboard.dto.response.DashboardResponse;
 import com.yhg.hotelbooking.domain.dashboard.service.DashboardService;
 import com.yhg.hotelbooking.domain.ota.dto.request.OtaReservationRequest;
 import com.yhg.hotelbooking.domain.ota.dto.response.OtaReservationResponse;
@@ -16,8 +17,8 @@ public class DashboardController {
     private final DashboardService dashboardService;
 
     @GetMapping
-    public ResponseEntity<OtaReservationResponse> getDashboard() {
-        OtaReservationResponse response = dashboardService.getDashboard();
+    public ResponseEntity<DashboardResponse> getDashboard() {
+        DashboardResponse response = dashboardService.getDashboard();
         return ResponseEntity.ok(response);
     }
 }
