@@ -48,9 +48,9 @@ public class RoomDateInventory {
     public RoomDateInventory(RoomType roomType, LocalDate date) {
         this.roomType = roomType;
         this.date = date;
-        this.totalCount = 21;
+        this.totalCount = roomType.getTotalCount();
         this.bookedCount = 0;
-        this.availableCount = 21;
+        this.availableCount = roomType.getTotalCount();
     }
 
     public void book() {
