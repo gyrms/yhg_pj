@@ -2,8 +2,6 @@ package com.yhg.hotelbooking.domain.room.service;
 
 import com.yhg.hotelbooking.domain.allotment.entity.OtaChannelAllotment;
 import com.yhg.hotelbooking.domain.allotment.repository.OtaChannelAllotmentRepository;
-import com.yhg.hotelbooking.domain.hotel.dto.request.HotelRequest;
-import com.yhg.hotelbooking.domain.hotel.dto.response.HotelResponse;
 import com.yhg.hotelbooking.domain.hotel.entity.Hotel;
 import com.yhg.hotelbooking.domain.hotel.repository.HotelRepository;
 import com.yhg.hotelbooking.domain.inventory.entity.RoomDateInventory;
@@ -16,7 +14,6 @@ import com.yhg.hotelbooking.domain.room.repository.RoomTypeRepository;
 import com.yhg.hotelbooking.global.config.CustomException;
 import com.yhg.hotelbooking.global.config.ErrorCode;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -70,14 +67,14 @@ public class RoomTypeService {
         for (LocalDate date = start; date.isBefore(end); date = date.plusDays(1)) {
 
             inventories.add(RoomDateInventory.builder()
-                    .roomtype(roomType)
+                    .roomType(roomType)
                     .date(date)
                     .build());
 
             for (OtaChannel ota : OtaChannel.values()) {
                 allotments.add(OtaChannelAllotment.builder()
                         .otaChannel(ota)
-                        .roomtype(roomType)
+                        .roomType(roomType)
                         .date(date)
                         .build());
             }

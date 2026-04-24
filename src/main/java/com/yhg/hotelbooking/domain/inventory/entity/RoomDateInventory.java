@@ -33,7 +33,7 @@ public class RoomDateInventory {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "room_type_id", nullable = false)
-    private RoomType roomtype;
+    private RoomType roomType;
 
     private LocalDate date;
 
@@ -45,8 +45,8 @@ public class RoomDateInventory {
     private Integer version;
 
     @Builder
-    public RoomDateInventory(RoomType roomtype, LocalDate date) {
-        this.roomtype = roomtype;
+    public RoomDateInventory(RoomType roomType, LocalDate date) {
+        this.roomType = roomType;
         this.date = date;
         this.totalCount = 21;
         this.bookedCount = 0;
