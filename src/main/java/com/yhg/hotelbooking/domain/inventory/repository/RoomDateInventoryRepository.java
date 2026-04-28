@@ -6,7 +6,9 @@ import jakarta.persistence.LockModeType;
 import jakarta.persistence.QueryHint;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Lock;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.jpa.repository.QueryHints;
+import org.springframework.data.repository.query.Param;
 
 import java.time.LocalDate;
 import java.util.Optional;
@@ -18,7 +20,9 @@ public interface RoomDateInventoryRepository extends JpaRepository<RoomDateInven
     @Lock(LockModeType.PESSIMISTIC_WRITE)
     @QueryHints(@QueryHint(name = "jakarta.persistence.lock.timeout", value =
             "3000"))
-    Optional<RoomDateInventory> findByRoomTypeAndDateForUpdate(RoomType roomType,
-                                                               LocalDate date);
+    @Query("SELECT r FROM RoomDateInventory r WHERE r.roomType = :roomType AND r.date = :date")
+    Optional<RoomDateInventory> findByRoomTypeAndDateWithLock(
+            @Param("roomType") RoomType roomType,
+            @Param("date") LocalDate date);
 
 }

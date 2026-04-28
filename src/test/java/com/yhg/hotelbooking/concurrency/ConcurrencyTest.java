@@ -28,7 +28,7 @@ public class ConcurrencyTest {
     private RoomTypeRepository roomTypeRepository;
 
     @Test
-    @Transactional
+    @org.springframework.transaction.annotation.Transactional
     void 동시_예약_30개_테스트() throws InterruptedException {
         int threadCount = 30;
         ExecutorService executorService = Executors.newFixedThreadPool(threadCount);
@@ -65,7 +65,7 @@ public class ConcurrencyTest {
         RoomType roomType = roomTypeRepository.findById(1L).orElseThrow();
 
         RoomDateInventory result = roomDateInventoryRepository
-                .findByRoomTypeAndDateNoLock(roomType, LocalDate.now().plusDays(1))
+                .findByRoomTypeAndDate(roomType, LocalDate.now().plusDays(1))
                 .orElseThrow();
         System.out.println("=== 결과 ===");
         System.out.println("available_count: " + result.getAvailableCount());

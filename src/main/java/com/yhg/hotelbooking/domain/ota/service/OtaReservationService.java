@@ -131,7 +131,7 @@ public class OtaReservationService {
         // 5. 실제 재고 차감
         for (LocalDate date = checkin; date.isBefore(checkout); date = date.plusDays(1)) {
             RoomDateInventory rdi = roomDateInventoryRepository
-                    .findByRoomTypeAndDateForUpdate(roomType, date)
+                    .findByRoomTypeAndDateWithLock(roomType, date)
                     .orElseThrow(() -> new CustomException(ErrorCode.INVENTORY_NOT_FOUND));
             if (isplay) {
                 rdi.book();
@@ -145,10 +145,11 @@ public class OtaReservationService {
 
     private void checkOtaAllotment(LocalDate checkin, LocalDate checkout, OtaChannel otaChannel, RoomType roomType, boolean isplay) {
 
-        for (LocalDate date = checkin; date.isBefore(checkout); date = date.plusDays(1)) {
+        for (LocalDate date = checkin; date.isBefore(checkout); date =  date.plusDays(1)) {
             OtaChannelAllotment ota = otaChannelAllotmentRepository
-                    .findByOtaChannelAndRoomTypeAndDate(otaChannel, roomType, date)
-                    .orElseThrow(() -> new CustomException(ErrorCode.ALLOTMENT_NOT_FOUND));
+                    .findByOtaChannelAndRoomTypeAndDateWithLock(otaChannel,roomType, date)  // ← ForUpdate
+                    .orElseThrow(() -> new
+                            CustomException(ErrorCode.ALLOTMENT_NOT_FOUND));
             if (isplay) {
                 ota.book();
             } else {
@@ -157,8 +158,8 @@ public class OtaReservationService {
                 }
             }
         }
-
     }
+
 
     private void setRecoverRoomInventory(Reservation rv, RoomType roomType) {
         for (LocalDate date = rv.getCheckInDate(); date.isBefore(rv.getCheckOutDate()); date = date.plusDays(1)) {
