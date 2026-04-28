@@ -32,8 +32,6 @@ public class RoomDateInventory {
     private Integer bookedCount;
     private Integer availableCount;
 
-    private Integer version;
-
     @Builder
     public RoomDateInventory(RoomType roomType, LocalDate date) {
         this.roomType = roomType;

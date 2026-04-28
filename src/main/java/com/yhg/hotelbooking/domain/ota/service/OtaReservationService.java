@@ -82,10 +82,7 @@ public class OtaReservationService {
     }
 
     public OtaReservationResponse createReservation(OtaReservationRequest request) {
-        // 1. 멱등성 확인
-        /*if (otaRequestLogRepository.existsByOtaChannelAndOtaReservationId(request.getOtaChannel(), request.getOtaReservationId())) {
-            throw new CustomException(ErrorCode.DUPLICATE_RESERVATION);
-        }*/
+
 
         OtaRequestLog oldReservation =  otaRequestLogRepository.findByOtaChannelAndOtaReservationId(request.getOtaChannel(), request.getOtaReservationId()).orElse(null);
 
