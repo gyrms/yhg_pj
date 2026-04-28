@@ -1,5 +1,6 @@
 package com.yhg.hotelbooking.domain.Business.entity;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
@@ -15,6 +16,7 @@ public class BusinessDate {
     @Id
     private Long id = 1L;
 
+    @Column(name = "business_date")
     private LocalDate currentDate;
 
     public void nextDay() {

@@ -31,14 +31,16 @@ public class ConcurrencyTest {
         int threadCount = 30;
         ExecutorService executorService = Executors.newFixedThreadPool(threadCount);
         CountDownLatch latch = new CountDownLatch(threadCount);
-
+        OtaChannel[] channels = {OtaChannel.YANOLJA, OtaChannel.YEOGI,OtaChannel.YOGISEO};
         for (int i = 0; i < threadCount; i++) {
             final int idx = i;
+            final OtaChannel channel = channels[idx % 3];  // 0,1,2,0,1,2... 순서로
+
             executorService.submit(() -> {
                 try {
                     // 예약 요청 생성 후 createReservation 호출
                     OtaReservationRequest request = OtaReservationRequest.builder()
-                            .otaChannel(OtaChannel.YEOGI)
+                            .otaChannel(channel)           // ← 채널 3개 번갈아가며
                             .otaReservationId("reservation" + idx)
                             .roomTypeId(1L)
                             .guestName("guest" + idx)
@@ -47,6 +49,7 @@ public class ConcurrencyTest {
                             .checkOutDate(LocalDate.now().plusDays(2))
                             .totalPrice(10000)
                             .build();
+                    System.out.println(request.toString());
                     otaReservationService.createReservation(request);
                 } finally {
                     latch.countDown();
@@ -60,7 +63,7 @@ public class ConcurrencyTest {
         RoomType roomType = roomTypeRepository.findById(1L).orElseThrow();
 
         RoomDateInventory roomDateInventory = roomDateInventoryRepository.findByRoomTypeAndDate(roomType,LocalDate.now().plusDays(1)).orElseThrow();
-        System.out.println(roomDateInventory.getAvailableCount());
+
     }
 }
 /*
