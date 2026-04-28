@@ -87,10 +87,10 @@ public class OtaReservationService {
             throw new CustomException(ErrorCode.DUPLICATE_RESERVATION);
         }*/
 
-        OtaRequestLog OldReservation =  otaRequestLogRepository.existsByOtaChannelAndOtaReservationId(request.getOtaChannel(), request.getOtaReservationId()).orElse(null);
+        OtaRequestLog oldReservation =  otaRequestLogRepository.findByOtaChannelAndOtaReservationId(request.getOtaChannel(), request.getOtaReservationId()).orElse(null);
 
-        if(OldReservation != null){
-            return OtaReservationResponse.from(OldReservation.getReservation(), request.getOtaReservationId());
+        if(oldReservation != null){
+            return OtaReservationResponse.from(oldReservation.getReservation(), request.getOtaReservationId());
         }
 
         // 2. RoomType 조회
@@ -132,7 +132,7 @@ public class OtaReservationService {
         for (LocalDate date = checkin; date.isBefore(checkout); date = date.plusDays(1)) {
             RoomDateInventory rdi = roomDateInventoryRepository
                     .findByRoomTypeAndDate(roomType, date)
-                    .orElseThrow(() -> new CustomException(ErrorCode.INVENTORY_SOLD_OUT));
+                    .orElseThrow(() -> new CustomException(ErrorCode.INVENTORY_NOT_FOUND));
             if (isplay) {
                 rdi.book();
             } else {
@@ -148,7 +148,7 @@ public class OtaReservationService {
         for (LocalDate date = checkin; date.isBefore(checkout); date = date.plusDays(1)) {
             OtaChannelAllotment ota = otaChannelAllotmentRepository
                     .findByOtaChannelAndRoomTypeAndDate(otaChannel, roomType, date)
-                    .orElseThrow(() -> new CustomException(ErrorCode.ALLOTMENT_EXHAUSTED));
+                    .orElseThrow(() -> new CustomException(ErrorCode.INVENTORY_NOT_FOUND));
             if (isplay) {
                 ota.book();
             } else {

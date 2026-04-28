@@ -66,11 +66,16 @@ public class NightAuditService {
                 .noShowReservations(noShowReservations)
                 .build();
     }
-}
+/*
+    @Transactional
+    @Scheduled(cron = "1 0 0 * * *")
+    public NightAuditResponse findCheckoutDataToday2222() {
 
-   /* @Transactional
-    public NightAuditResponse findCheckoutDataToday() {
-        List<Reservation> rs = reservationRepository.findCheckoutDataToday(LocalDate.now());
+        BusinessDate businessDate = businessDateRepository.findById(1L)
+                .orElseThrow(() -> new
+                        CustomException(ErrorCode.INTERNAL_SERVER_ERROR));
+
+        List<Reservation> rs = reservationRepository.findCheckoutDataToday(businessDate.getCurrentDate());
 
         for (Reservation reservation : rs) {
             // 1. NO_SHOW 변경
@@ -97,5 +102,8 @@ public class NightAuditService {
                 .build();
 
 
-    }
-}*/
+    }*/
+
+}
+
+
