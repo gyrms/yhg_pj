@@ -1,21 +1,22 @@
 package com.yhg.hotelbooking.concurrency;
 
-import com.yhg.hotelbooking.domain.inventory.entity.RoomDateInventory;
 import com.yhg.hotelbooking.domain.inventory.repository.RoomDateInventoryRepository;
 import com.yhg.hotelbooking.domain.ota.dto.request.OtaReservationRequest;
 import com.yhg.hotelbooking.domain.ota.service.OtaReservationService;
 import com.yhg.hotelbooking.domain.otachannel.entity.OtaChannel;
 import com.yhg.hotelbooking.domain.room.entity.RoomType;
 import com.yhg.hotelbooking.domain.room.repository.RoomTypeRepository;
-import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.support.TransactionTemplate;
 
 import java.time.LocalDate;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.atomic.AtomicInteger;
 
 @SpringBootTest
 public class ConcurrencyTest {
@@ -26,33 +27,42 @@ public class ConcurrencyTest {
     private RoomDateInventoryRepository roomDateInventoryRepository;
     @Autowired
     private RoomTypeRepository roomTypeRepository;
+    @Autowired
+    private PlatformTransactionManager transactionManager;
 
     @Test
-    @org.springframework.transaction.annotation.Transactional
     void 동시_예약_30개_테스트() throws InterruptedException {
         int threadCount = 30;
-        ExecutorService executorService = Executors.newFixedThreadPool(threadCount);
+        ExecutorService executorService =
+                Executors.newFixedThreadPool(threadCount);
         CountDownLatch latch = new CountDownLatch(threadCount);
-        OtaChannel[] channels = {OtaChannel.YANOLJA, OtaChannel.YEOGI,OtaChannel.YOGISEO};
+        OtaChannel[] channels = {OtaChannel.YANOLJA, OtaChannel.YEOGI, OtaChannel.YOGISEO};
+
+        AtomicInteger success = new AtomicInteger(0);
+        AtomicInteger failure = new AtomicInteger(0);
+
         for (int i = 0; i < threadCount; i++) {
             final int idx = i;
-            final OtaChannel channel = channels[idx % 3];  // 0,1,2,0,1,2... 순서로
+            final OtaChannel channel = channels[idx % 3];
 
             executorService.submit(() -> {
                 try {
-                    // 예약 요청 생성 후 createReservation 호출
-                    OtaReservationRequest request = OtaReservationRequest.builder()
-                            .otaChannel(channel)           // ← 채널 3개 번갈아가며
-                            .otaReservationId("reservation" + idx)
-                            .roomTypeId(1L)
-                            .guestName("guest" + idx)
-                            .guestPhone("010-1234-5678")
-                            .checkInDate(LocalDate.now().plusDays(1))
-                            .checkOutDate(LocalDate.now().plusDays(2))
-                            .totalPrice(10000)
-                            .build();
-                    System.out.println(request.toString());
+                    OtaReservationRequest request =
+                            OtaReservationRequest.builder()
+                                    .otaChannel(channel)
+                                    .otaReservationId("reservation" + idx)
+                                    .roomTypeId(1L)
+                                    .guestName("guest" + idx)
+                                    .guestPhone("010-1234-5678")
+                                    .checkInDate(LocalDate.now().plusDays(1))
+                                    .checkOutDate(LocalDate.now().plusDays(2))
+                                    .totalPrice(10000)
+                                    .build();
                     otaReservationService.createReservation(request);
+                    success.incrementAndGet();
+                } catch (Exception e) {
+                    System.out.println("실패: " + e.getMessage());
+                    failure.incrementAndGet();
                 } finally {
                     latch.countDown();
                 }
@@ -60,15 +70,22 @@ public class ConcurrencyTest {
         }
 
         latch.await();
-        // DB에서 해당 날짜 available_count 확인
-        // 30개 요청인데 실제 재고보다 많이 차감됐는지 확인
-        RoomType roomType = roomTypeRepository.findById(1L).orElseThrow();
 
-        RoomDateInventory result = roomDateInventoryRepository
-                .findByRoomTypeAndDate(roomType, LocalDate.now().plusDays(1))
-                .orElseThrow();
-        System.out.println("=== 결과 ===");
-        System.out.println("available_count: " + result.getAvailableCount());
+        // 새 트랜잭션으로 결과 조회
+        TransactionTemplate txTemplate = new TransactionTemplate(transactionManager);
+        Integer availableCount = txTemplate.execute(status -> {
+            RoomType roomType = roomTypeRepository.findById(1L).orElseThrow();
+            return roomDateInventoryRepository
+                    .findByRoomTypeAndDate(roomType,
+                            LocalDate.now().plusDays(1))
+                    .orElseThrow()
+                    .getAvailableCount();
+        });
+
+        System.out.println("===== 결과 =====");
+        System.out.println("성공: " + success.get());
+        System.out.println("실패: " + failure.get());
+        System.out.println("available_count: " + availableCount);
     }
 }
 /*

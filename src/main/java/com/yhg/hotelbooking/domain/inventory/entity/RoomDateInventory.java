@@ -31,7 +31,7 @@ public class RoomDateInventory {
 
     private Integer bookedCount;
     private Integer availableCount;
-    @Version
+
     private Integer version;
 
     @Builder
