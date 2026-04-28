@@ -10,9 +10,9 @@ import java.time.LocalDate;
 import java.util.Optional;
 
 public interface OtaRequestLogRepository extends JpaRepository<OtaRequestLog, Long> {
-    boolean existsByOtaChannelAndOtaReservationId(
-            OtaChannel otaChannel, String otaReservationId
-    );
+
 
     Optional<OtaRequestLog> findByOtaReservationId(String otaReservationId);
+
+    Optional<OtaRequestLog> existsByOtaChannelAndOtaReservationId(OtaChannel otaChannel, String otaReservationId);
 }

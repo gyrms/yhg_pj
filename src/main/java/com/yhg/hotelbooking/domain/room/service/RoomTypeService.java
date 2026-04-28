@@ -104,7 +104,7 @@ public class RoomTypeService {
             for (OtaChannel ota : OtaChannel.values()) {
 
                 OtaChannelAllotment otaChannelAllotment = otaChannelAllotmentRepository.findByOtaChannelAndRoomTypeAndDate(ota,roomType,date)
-                        .orElseThrow(()-> new CustomException(ErrorCode.RESERVATION_NOT_FOUND));
+                        .orElseThrow(()-> new CustomException(ErrorCode.ALLOTMENT_NOT_FOUND));
 
                 otaList.add(OtaAllotmentInfo.builder()
                             .channel(ota.name())

@@ -83,8 +83,14 @@ public class OtaReservationService {
 
     public OtaReservationResponse createReservation(OtaReservationRequest request) {
         // 1. 멱등성 확인
-        if (otaRequestLogRepository.existsByOtaChannelAndOtaReservationId(request.getOtaChannel(), request.getOtaReservationId())) {
+        /*if (otaRequestLogRepository.existsByOtaChannelAndOtaReservationId(request.getOtaChannel(), request.getOtaReservationId())) {
             throw new CustomException(ErrorCode.DUPLICATE_RESERVATION);
+        }*/
+
+        OtaRequestLog OldReservation =  otaRequestLogRepository.existsByOtaChannelAndOtaReservationId(request.getOtaChannel(), request.getOtaReservationId()).orElse(null);
+
+        if(OldReservation != null){
+            return OtaReservationResponse.from(OldReservation.getReservation(), request.getOtaReservationId());
         }
 
         // 2. RoomType 조회
@@ -126,12 +132,12 @@ public class OtaReservationService {
         for (LocalDate date = checkin; date.isBefore(checkout); date = date.plusDays(1)) {
             RoomDateInventory rdi = roomDateInventoryRepository
                     .findByRoomTypeAndDate(roomType, date)
-                    .orElseThrow(() -> new CustomException(ErrorCode.INVENTORY_NOT_FOUND));
+                    .orElseThrow(() -> new CustomException(ErrorCode.INVENTORY_SOLD_OUT));
             if (isplay) {
                 rdi.book();
             } else {
                 if (rdi.getAvailableCount() < 1) {
-                    throw new CustomException(ErrorCode.INVENTORY_NOT_FOUND);
+                    throw new CustomException(ErrorCode.INVENTORY_SOLD_OUT);
                 }
             }
         }
@@ -142,12 +148,12 @@ public class OtaReservationService {
         for (LocalDate date = checkin; date.isBefore(checkout); date = date.plusDays(1)) {
             OtaChannelAllotment ota = otaChannelAllotmentRepository
                     .findByOtaChannelAndRoomTypeAndDate(otaChannel, roomType, date)
-                    .orElseThrow(() -> new CustomException(ErrorCode.ALLOTMENT_NOT_FOUND));
+                    .orElseThrow(() -> new CustomException(ErrorCode.ALLOTMENT_EXHAUSTED));
             if (isplay) {
                 ota.book();
             } else {
                 if (ota.getRemainingCount() < 1) {
-                    throw new CustomException(ErrorCode.ALLOTMENT_NOT_FOUND);
+                    throw new CustomException(ErrorCode.ALLOTMENT_EXHAUSTED);
                 }
             }
         }
