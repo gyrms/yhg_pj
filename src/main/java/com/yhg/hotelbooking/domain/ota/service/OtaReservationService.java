@@ -131,7 +131,7 @@ public class OtaReservationService {
         // 5. 실제 재고 차감
         for (LocalDate date = checkin; date.isBefore(checkout); date = date.plusDays(1)) {
             RoomDateInventory rdi = roomDateInventoryRepository
-                    .findByRoomTypeAndDate(roomType, date)
+                    .findByRoomTypeAndDateForUpdate(roomType, date)
                     .orElseThrow(() -> new CustomException(ErrorCode.INVENTORY_NOT_FOUND));
             if (isplay) {
                 rdi.book();

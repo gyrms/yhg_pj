@@ -7,6 +7,7 @@ import com.yhg.hotelbooking.domain.ota.service.OtaReservationService;
 import com.yhg.hotelbooking.domain.otachannel.entity.OtaChannel;
 import com.yhg.hotelbooking.domain.room.entity.RoomType;
 import com.yhg.hotelbooking.domain.room.repository.RoomTypeRepository;
+import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -27,6 +28,7 @@ public class ConcurrencyTest {
     private RoomTypeRepository roomTypeRepository;
 
     @Test
+    @Transactional
     void 동시_예약_30개_테스트() throws InterruptedException {
         int threadCount = 30;
         ExecutorService executorService = Executors.newFixedThreadPool(threadCount);
@@ -62,8 +64,11 @@ public class ConcurrencyTest {
         // 30개 요청인데 실제 재고보다 많이 차감됐는지 확인
         RoomType roomType = roomTypeRepository.findById(1L).orElseThrow();
 
-        RoomDateInventory roomDateInventory = roomDateInventoryRepository.findByRoomTypeAndDate(roomType,LocalDate.now().plusDays(1)).orElseThrow();
-
+        RoomDateInventory result = roomDateInventoryRepository
+                .findByRoomTypeAndDateNoLock(roomType, LocalDate.now().plusDays(1))
+                .orElseThrow();
+        System.out.println("=== 결과 ===");
+        System.out.println("available_count: " + result.getAvailableCount());
     }
 }
 /*
