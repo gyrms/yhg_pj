@@ -137,7 +137,7 @@ public class OtaReservationService {
                 rdi.book();
             } else {
                 if (rdi.getAvailableCount() < 1) {
-                    throw new CustomException(ErrorCode.INVENTORY_NOT_FOUND);
+                    throw new CustomException(ErrorCode.INVENTORY_SOLD_OUT);
                 }
             }
         }
@@ -148,7 +148,7 @@ public class OtaReservationService {
         for (LocalDate date = checkin; date.isBefore(checkout); date = date.plusDays(1)) {
             OtaChannelAllotment ota = otaChannelAllotmentRepository
                     .findByOtaChannelAndRoomTypeAndDate(otaChannel, roomType, date)
-                    .orElseThrow(() -> new CustomException(ErrorCode.ALLOTMENT_EXHAUSTED));
+                    .orElseThrow(() -> new CustomException(ErrorCode.ALLOTMENT_NOT_FOUND));
             if (isplay) {
                 ota.book();
             } else {
