@@ -1,11 +1,17 @@
 package com.yhg.hotelbooking.concurrency;
 
+import com.yhg.hotelbooking.domain.allotment.entity.OtaChannelAllotment;
+import com.yhg.hotelbooking.domain.allotment.repository.OtaChannelAllotmentRepository;
+import com.yhg.hotelbooking.domain.inventory.entity.RoomDateInventory;
 import com.yhg.hotelbooking.domain.inventory.repository.RoomDateInventoryRepository;
 import com.yhg.hotelbooking.domain.ota.dto.request.OtaReservationRequest;
+import com.yhg.hotelbooking.domain.ota.repository.OtaRequestLogRepository;
 import com.yhg.hotelbooking.domain.ota.service.OtaReservationService;
 import com.yhg.hotelbooking.domain.otachannel.entity.OtaChannel;
+import com.yhg.hotelbooking.domain.reservation.repository.ReservationRepository;
 import com.yhg.hotelbooking.domain.room.entity.RoomType;
 import com.yhg.hotelbooking.domain.room.repository.RoomTypeRepository;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -13,6 +19,8 @@ import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.support.TransactionTemplate;
 
 import java.time.LocalDate;
+import java.util.List;
+import java.util.UUID;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -29,6 +37,13 @@ public class ConcurrencyTest {
     private RoomTypeRepository roomTypeRepository;
     @Autowired
     private PlatformTransactionManager transactionManager;
+    @Autowired
+    private OtaRequestLogRepository otaRequestLogRepository;
+    @Autowired
+    private ReservationRepository reservationRepository;
+    @Autowired
+    private OtaChannelAllotmentRepository otaChannelAllotmentRepository;
+
 
     @Test
     void 동시_예약_30개_테스트() throws InterruptedException {
@@ -50,7 +65,7 @@ public class ConcurrencyTest {
                     OtaReservationRequest request =
                             OtaReservationRequest.builder()
                                     .otaChannel(channel)
-                                    .otaReservationId("reservation" + idx)
+                                    .otaReservationId("reservation" + idx + "-" + UUID.randomUUID())
                                     .roomTypeId(1L)
                                     .guestName("guest" + idx)
                                     .guestPhone("010-1234-5678")
@@ -87,6 +102,38 @@ public class ConcurrencyTest {
         System.out.println("실패: " + failure.get());
         System.out.println("available_count: " + availableCount);
     }
+
+    @BeforeEach
+    void setUp() {
+        otaRequestLogRepository.deleteAll();
+        reservationRepository.deleteAll();
+
+        List<RoomDateInventory> inventories = roomDateInventoryRepository.findAll();
+        inventories.forEach(RoomDateInventory::reset);
+        roomDateInventoryRepository.saveAll(inventories);
+
+        List<OtaChannelAllotment> allotments = otaChannelAllotmentRepository.findAll();
+        allotments.forEach(OtaChannelAllotment::reset);
+        otaChannelAllotmentRepository.saveAll(allotments);
+
+        // 초기 상태 확인
+        roomDateInventoryRepository.findAll()
+                .forEach(rdi -> System.out.println(
+                        "inventory - date: " + rdi.getDate() +
+                                ", total: " + rdi.getTotalCount() +
+                                ", available: " + rdi.getAvailableCount()));
+
+        otaChannelAllotmentRepository.findAll()
+                .forEach(ota -> System.out.println(
+                        "allotment - channel: " + ota.getOtaChannel() +
+                                ", date: " + ota.getDate() +
+                                ", allotted: " + ota.getAllottedCount() +
+                                ", remaining: " + ota.getRemainingCount()));
+    }
+
+
+
+
 }
 /*
 

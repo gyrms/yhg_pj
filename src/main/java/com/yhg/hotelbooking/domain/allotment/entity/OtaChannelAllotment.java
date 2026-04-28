@@ -59,4 +59,8 @@ public class OtaChannelAllotment {
         this.remainingCount++;
     }
 
+    public void reset() {
+        this.bookedCount = 0;
+        this.remainingCount = this.allottedCount;
+    }
 }

@@ -18,15 +18,17 @@ import com.yhg.hotelbooking.domain.room.entity.RoomType;
 import com.yhg.hotelbooking.domain.room.repository.RoomTypeRepository;
 import com.yhg.hotelbooking.global.config.CustomException;
 import com.yhg.hotelbooking.global.config.ErrorCode;
-import jakarta.transaction.Transactional;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDate;
 
 @Service
 @RequiredArgsConstructor
-@Transactional
+@Transactional(isolation = Isolation.READ_COMMITTED)
 public class OtaReservationService {
 
     private final OtaRequestLogRepository otaRequestLogRepository;
@@ -49,12 +51,10 @@ public class OtaReservationService {
 
 
 
-        checkRoomInventory(request.getCheckInDate(),request.getCheckOutDate(), rv.getRoomType(), false);
-        checkOtaAllotment(request.getCheckInDate(),request.getCheckOutDate(), rv.getOtaChannel(),rv.getRoomType(),false);
+        bookRoomInventory(request.getCheckInDate(),request.getCheckOutDate(), rv.getRoomType());
+        bookOtaAllotment(request.getCheckInDate(),request.getCheckOutDate(), rv.getOtaChannel(),rv.getRoomType());
 
-        checkRoomInventory(request.getCheckInDate(),request.getCheckOutDate(), rv.getRoomType(), true);
-        checkOtaAllotment(request.getCheckInDate(),request.getCheckOutDate(), rv.getOtaChannel(),rv.getRoomType(), true);
-            rv.modify(request.getCheckInDate(),request.getCheckOutDate(),request.getTotalPrice());
+        rv.modify(request.getCheckInDate(),request.getCheckOutDate(),request.getTotalPrice());
 
 
             return OtaReservationResponse.from(rv, otaRequestLog.getOtaReservationId());
@@ -94,11 +94,9 @@ public class OtaReservationService {
         RoomType roomType = roomTypeRepository.findById(request.getRoomTypeId())
                 .orElseThrow(() -> new CustomException(ErrorCode.ROOM_TYPE_NOT_FOUND));
 
-        checkRoomInventory(request.getCheckInDate(),request.getCheckOutDate(), roomType, false);
-        checkOtaAllotment(request.getCheckInDate(),request.getCheckOutDate(), request.getOtaChannel(),roomType,false);
+        bookRoomInventory(request.getCheckInDate(),request.getCheckOutDate(), roomType);
+        bookOtaAllotment(request.getCheckInDate(),request.getCheckOutDate(), request.getOtaChannel(),roomType);
 
-        checkRoomInventory(request.getCheckInDate(),request.getCheckOutDate(), roomType, true);
-        checkOtaAllotment(request.getCheckInDate(),request.getCheckOutDate(), request.getOtaChannel(),roomType,true);
 
         Reservation rv = Reservation.builder()
                 .roomType(roomType)
@@ -123,37 +121,30 @@ public class OtaReservationService {
 
     }
 
-    private void checkRoomInventory(LocalDate checkin,LocalDate checkout, RoomType roomType, boolean isplay) {
-
-        // 5. 실제 재고 차감
+    private void bookRoomInventory(LocalDate checkin, LocalDate checkout, RoomType roomType){
         for (LocalDate date = checkin; date.isBefore(checkout); date = date.plusDays(1)) {
             RoomDateInventory rdi = roomDateInventoryRepository
                     .findByRoomTypeAndDateWithLock(roomType, date)
                     .orElseThrow(() -> new CustomException(ErrorCode.INVENTORY_NOT_FOUND));
-            if (isplay) {
-                rdi.book();
-            } else {
-                if (rdi.getAvailableCount() < 1) {
-                    throw new CustomException(ErrorCode.INVENTORY_SOLD_OUT);
-                }
+
+            if (rdi.getAvailableCount() < 1) {          // 체크
+                throw new CustomException(ErrorCode.INVENTORY_SOLD_OUT);
             }
+            rdi.book();                                  // 차감 (같이)
         }
     }
 
-    private void checkOtaAllotment(LocalDate checkin, LocalDate checkout, OtaChannel otaChannel, RoomType roomType, boolean isplay) {
+    private void bookOtaAllotment(LocalDate checkin, LocalDate checkout, OtaChannel otaChannel,RoomType roomType) {
 
-        for (LocalDate date = checkin; date.isBefore(checkout); date =  date.plusDays(1)) {
+        for (LocalDate date = checkin; date.isBefore(checkout); date = date.plusDays(1)) {
             OtaChannelAllotment ota = otaChannelAllotmentRepository
-                    .findByOtaChannelAndRoomTypeAndDateWithLock(otaChannel,roomType, date)  // ← ForUpdate
-                    .orElseThrow(() -> new
-                            CustomException(ErrorCode.ALLOTMENT_NOT_FOUND));
-            if (isplay) {
-                ota.book();
-            } else {
-                if (ota.getRemainingCount() < 1) {
-                    throw new CustomException(ErrorCode.ALLOTMENT_EXHAUSTED);
-                }
+                    .findByOtaChannelAndRoomTypeAndDateWithLock(otaChannel, roomType, date)
+                    .orElseThrow(() -> new CustomException(ErrorCode.ALLOTMENT_NOT_FOUND));
+
+            if (ota.getRemainingCount() < 1) {           // 체크
+                throw new CustomException(ErrorCode.ALLOTMENT_EXHAUSTED);
             }
+            ota.book();                                  // 차감 (같이)
         }
     }
 

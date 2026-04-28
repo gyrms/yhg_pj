@@ -51,5 +51,8 @@ public class RoomDateInventory {
         this.availableCount++;
     }
 
-
+    public void reset() {
+        this.bookedCount = 0;
+        this.availableCount = this.totalCount;
+    }
 }

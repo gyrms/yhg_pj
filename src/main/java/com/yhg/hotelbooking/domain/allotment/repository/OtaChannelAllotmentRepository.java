@@ -24,7 +24,7 @@ public interface OtaChannelAllotmentRepository extends JpaRepository<OtaChannelA
 
     // 락 있는 조회 (예약 처리 전용)
     @Lock(LockModeType.PESSIMISTIC_WRITE)
-    @QueryHints(@QueryHint(name = "jakarta.persistence.lock.timeout", value = "3000"))
+    @QueryHints(@QueryHint(name = "jakarta.persistence.lock.timeout", value = "10000"))
     @Query("SELECT o FROM OtaChannelAllotment o WHERE o.otaChannel = :otaChannel AND o.roomType = :roomType AND o.date = :date")
     Optional<OtaChannelAllotment> findByOtaChannelAndRoomTypeAndDateWithLock(
             @Param("otaChannel") OtaChannel otaChannel,

@@ -15,4 +15,6 @@ public interface OtaRequestLogRepository extends JpaRepository<OtaRequestLog, Lo
     Optional<OtaRequestLog> findByOtaReservationId(String otaReservationId);
 
     Optional<OtaRequestLog> findByOtaChannelAndOtaReservationId(OtaChannel otaChannel, String otaReservationId);
+
+
 }
