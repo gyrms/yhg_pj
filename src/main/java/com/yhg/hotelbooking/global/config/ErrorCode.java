@@ -33,6 +33,9 @@ public enum ErrorCode {
     DUPLICATE_RESERVATION(HttpStatus.CONFLICT, "이미 처리된 예약 요청입니다."),
     NOT_CHECKIN_DATE(HttpStatus.BAD_REQUEST, "체크인 날짜가 아닙니다."),
 
+    LOCK_ACQUISITION_FAILED(HttpStatus.CONFLICT, "예약 처리 중입니다. 잠시 후 다시 시도해주세요."),
+
+
     INVENTORY_SOLD_OUT(HttpStatus.CONFLICT, "실제 객실 재고가 부족합니다."),
     ALLOTMENT_EXHAUSTED(HttpStatus.CONFLICT, "해당 OTA 채널의 할당 재고가 소진됐습니다."),
     RESERVATION_NOT_FOUND(HttpStatus.NOT_FOUND, "예약을 찾을수 없습니다. 정보가 없습니다.");

@@ -20,11 +20,15 @@ import com.yhg.hotelbooking.global.config.CustomException;
 import com.yhg.hotelbooking.global.config.ErrorCode;
 
 import lombok.RequiredArgsConstructor;
+import org.redisson.api.RLock;
+import org.redisson.api.RedissonClient;
 import org.springframework.stereotype.Service;
 
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
+
 import java.time.LocalDate;
+import java.util.concurrent.TimeUnit;
 
 @Service
 @RequiredArgsConstructor
@@ -36,7 +40,7 @@ public class OtaReservationService {
     private final RoomDateInventoryRepository roomDateInventoryRepository;
     private final OtaChannelAllotmentRepository otaChannelAllotmentRepository;
     private final ReservationRepository reservationRepository;
-
+    private final RedissonClient redissonClient;
 
     public OtaReservationResponse update(String otaResId, OtaModifyRequest request) {
 
@@ -46,18 +50,17 @@ public class OtaReservationService {
         if (rv.getStatus() == Reservationstatus.CANCELLED) {
             throw new CustomException(ErrorCode.CAN_NOT_CHANGE_CONFIRMABLE_STATUS);
         }
-            setRecoverRoomInventory(rv,rv.getRoomType());
-            setRecoverRoomOtaAllotment(rv,rv.getRoomType());
+        setRecoverRoomInventory(rv, rv.getRoomType());
+        setRecoverRoomOtaAllotment(rv, rv.getRoomType());
 
 
+        bookRoomInventory(request.getCheckInDate(), request.getCheckOutDate(), rv.getRoomType());
+        bookOtaAllotment(request.getCheckInDate(), request.getCheckOutDate(), rv.getOtaChannel(), rv.getRoomType());
 
-        bookRoomInventory(request.getCheckInDate(),request.getCheckOutDate(), rv.getRoomType());
-        bookOtaAllotment(request.getCheckInDate(),request.getCheckOutDate(), rv.getOtaChannel(),rv.getRoomType());
-
-        rv.modify(request.getCheckInDate(),request.getCheckOutDate(),request.getTotalPrice());
+        rv.modify(request.getCheckInDate(), request.getCheckOutDate(), request.getTotalPrice());
 
 
-            return OtaReservationResponse.from(rv, otaRequestLog.getOtaReservationId());
+        return OtaReservationResponse.from(rv, otaRequestLog.getOtaReservationId());
 
     }
 
@@ -65,8 +68,8 @@ public class OtaReservationService {
         OtaRequestLog otaRequestLog = otaRequestLogRepository.findByOtaReservationId(otaResId).orElseThrow(() -> new CustomException(ErrorCode.RESERVATION_NOT_FOUND));
         Reservation rv = otaRequestLog.getReservation();
         rv.cancel();
-        setRecoverRoomInventory(rv,rv.getRoomType());
-        setRecoverRoomOtaAllotment(rv,rv.getRoomType());
+        setRecoverRoomInventory(rv, rv.getRoomType());
+        setRecoverRoomOtaAllotment(rv, rv.getRoomType());
     }
 
     public OtaReservationResponse confirm(String otaResId) {
@@ -83,45 +86,62 @@ public class OtaReservationService {
 
     public OtaReservationResponse createReservation(OtaReservationRequest request) {
 
+        String lockKey = "lock:room:" + request.getRoomTypeId();
+        RLock lock = redissonClient.getLock(lockKey);
 
-        OtaRequestLog oldReservation =  otaRequestLogRepository.findByOtaChannelAndOtaReservationId(request.getOtaChannel(), request.getOtaReservationId()).orElse(null);
+        try {
+            // 최대 5초 기다리고, 락 잡으면 10초 후 자동 해제
+            boolean acquired = lock.tryLock(5, 10, TimeUnit.SECONDS);
+            if (!acquired) {
+                throw new CustomException(ErrorCode.LOCK_ACQUISITION_FAILED);
+            }
 
-        if(oldReservation != null){
-            return OtaReservationResponse.from(oldReservation.getReservation(), request.getOtaReservationId());
-        }
+                OtaRequestLog oldReservation = otaRequestLogRepository.findByOtaChannelAndOtaReservationId(request.getOtaChannel(), request.getOtaReservationId()).orElse(null);
 
-        // 2. RoomType 조회
-        RoomType roomType = roomTypeRepository.findById(request.getRoomTypeId())
-                .orElseThrow(() -> new CustomException(ErrorCode.ROOM_TYPE_NOT_FOUND));
+                if (oldReservation != null) {
+                    return OtaReservationResponse.from(oldReservation.getReservation(), request.getOtaReservationId());
+                }
 
-        bookRoomInventory(request.getCheckInDate(),request.getCheckOutDate(), roomType);
-        bookOtaAllotment(request.getCheckInDate(),request.getCheckOutDate(), request.getOtaChannel(),roomType);
+                // 2. RoomType 조회
+                RoomType roomType = roomTypeRepository.findById(request.getRoomTypeId())
+                        .orElseThrow(() -> new CustomException(ErrorCode.ROOM_TYPE_NOT_FOUND));
 
+                bookRoomInventory(request.getCheckInDate(), request.getCheckOutDate(), roomType);
+                bookOtaAllotment(request.getCheckInDate(), request.getCheckOutDate(), request.getOtaChannel(), roomType);
 
-        Reservation rv = Reservation.builder()
-                .roomType(roomType)
-                .otaChannel(request.getOtaChannel())
-                .checkOutDate(request.getCheckOutDate())
-                .checkInDate(request.getCheckInDate())
-                .totalPrice(request.getTotalPrice())
-                .guestName(request.getGuestName())
-                .guestPhone(request.getGuestPhone())
-                .build();
-        reservationRepository.save(rv);
+                Reservation rv = Reservation.builder()
+                        .roomType(roomType)
+                        .otaChannel(request.getOtaChannel())
+                        .checkOutDate(request.getCheckOutDate())
+                        .checkInDate(request.getCheckInDate())
+                        .totalPrice(request.getTotalPrice())
+                        .guestName(request.getGuestName())
+                        .guestPhone(request.getGuestPhone())
+                        .build();
+                reservationRepository.save(rv);
 
-        OtaRequestLog otaRequestLog = OtaRequestLog.builder()
-                .otaChannel(request.getOtaChannel())
-                .otaReservationId(request.getOtaReservationId())
-                .reservation(rv)
-                .requestType(RequestType.CREATE)
-                .build();
-        otaRequestLogRepository.save(otaRequestLog);
+                OtaRequestLog otaRequestLog = OtaRequestLog.builder()
+                        .otaChannel(request.getOtaChannel())
+                        .otaReservationId(request.getOtaReservationId())
+                        .reservation(rv)
+                        .requestType(RequestType.CREATE)
+                        .build();
+                otaRequestLogRepository.save(otaRequestLog);
 
-        return OtaReservationResponse.from(rv, request.getOtaReservationId());
+                return OtaReservationResponse.from(rv, request.getOtaReservationId());
 
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+                throw new CustomException(ErrorCode.LOCK_ACQUISITION_FAILED);
+            } finally {
+                // 내가 잡은 락이면 반드시 해제
+                if (lock.isHeldByCurrentThread()) {
+                    lock.unlock();
+                }
+            }
     }
 
-    private void bookRoomInventory(LocalDate checkin, LocalDate checkout, RoomType roomType){
+    private void bookRoomInventory(LocalDate checkin, LocalDate checkout, RoomType roomType) {
         for (LocalDate date = checkin; date.isBefore(checkout); date = date.plusDays(1)) {
             RoomDateInventory rdi = roomDateInventoryRepository
                     .findByRoomTypeAndDateWithLock(roomType, date)
@@ -134,7 +154,7 @@ public class OtaReservationService {
         }
     }
 
-    private void bookOtaAllotment(LocalDate checkin, LocalDate checkout, OtaChannel otaChannel,RoomType roomType) {
+    private void bookOtaAllotment(LocalDate checkin, LocalDate checkout, OtaChannel otaChannel, RoomType roomType) {
 
         for (LocalDate date = checkin; date.isBefore(checkout); date = date.plusDays(1)) {
             OtaChannelAllotment ota = otaChannelAllotmentRepository

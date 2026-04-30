@@ -1,4 +1,8 @@
 spring:
+  data:
+    redis:
+      host: localhost
+      port: 6379
   datasource:
     url: jdbc:mysql://220.72.99.7:3306/hotel_booking?useSSL=false&serverTimezone=Asia/Seoul&characterEncoding=UTF-8&allowPublicKeyRetrieval=true
     username: root
@@ -25,6 +29,4 @@ springdoc:
     path: /swagger-ui.html
   api-docs:
     path: /v3/api-docs
-
-
 
