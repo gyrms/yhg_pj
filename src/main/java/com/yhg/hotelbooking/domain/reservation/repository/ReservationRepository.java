@@ -2,6 +2,7 @@ package com.yhg.hotelbooking.domain.reservation.repository;
 
 
 import com.yhg.hotelbooking.domain.hotel.entity.Hotel;
+import com.yhg.hotelbooking.domain.otachannel.entity.OtaChannel;
 import com.yhg.hotelbooking.domain.reservation.entity.Reservation;
 import com.yhg.hotelbooking.domain.reservation.entity.Reservationstatus;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -28,4 +29,9 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
     List<Reservation> findCheckoutDataToday(@Param("date") LocalDate date);
 
     List<Reservation> findByStatusAndCreatedAtBefore(  Reservationstatus status,  LocalDateTime dateTime );
+
+    List<Reservation> findByCheckInDate(LocalDate date);
+
+    List<Reservation> findByOtaChannelAndCheckInDate(OtaChannel otaChannel, LocalDate date);
+
 }
