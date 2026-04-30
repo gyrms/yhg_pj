@@ -2,12 +2,10 @@ package com.yhg.hotelbooking.domain.stats.service;
 
 import com.yhg.hotelbooking.domain.otachannel.entity.OtaChannel;
 import com.yhg.hotelbooking.domain.reservation.entity.Reservation;
+import com.yhg.hotelbooking.domain.reservation.entity.Reservationstatus;
 import com.yhg.hotelbooking.domain.reservation.repository.ReservationRepository;
 import com.yhg.hotelbooking.domain.room.entity.RoomGrade;
-import com.yhg.hotelbooking.domain.stats.dto.response.ChannelBreakdown;
-import com.yhg.hotelbooking.domain.stats.dto.response.DailyStatsResponse;
-import com.yhg.hotelbooking.domain.stats.dto.response.RoomTypeBreakdown;
-import com.yhg.hotelbooking.domain.stats.dto.response.StatusBreakdown;
+import com.yhg.hotelbooking.domain.stats.dto.response.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -56,6 +54,36 @@ public class StatsService {
                 .totalReservations(totalReservations)
                 .statusBreakdown(StatusBreakdown.from(reservations))
                 .channelBreakdown(channelBreakdown)
+                .roomTypeBreakdown(roomTypeBreakdown)
+                .build();
+    }
+
+    public ChannelStatsResponse getChannelStats(OtaChannel channelName,LocalDate date) {
+        List<Reservation> reservations= reservationRepository.findByOtaChannelAndCheckInDate(channelName,date);
+
+        int totalRevenue = reservations.stream().filter(
+                r -> r.getStatus() == Reservationstatus.CONFIRMED
+                )
+                .mapToInt(Reservation::getTotalPrice)
+                .sum();
+        double avgNights = reservations.stream().mapToInt(Reservation::getNights).average().orElse(0);
+
+        List<RoomTypeBreakdown> roomTypeBreakdown = Arrays.stream(RoomGrade.values())
+                .map(grade -> {
+                    List<Reservation> filtered = reservations.stream()
+                            .filter(r -> r.getRoomType().getGrade() == grade)
+                            .collect(Collectors.toList());
+                    return RoomTypeBreakdown.from(grade.name(), filtered);
+                })
+                .collect(Collectors.toList());
+
+        return ChannelStatsResponse.builder()
+                .channel(channelName.name())
+                .date(date.toString())
+                .totalRevenue(totalRevenue)
+                .totalReservations(reservations.size())
+                .avgNights(avgNights)
+                .statusBreakdown(StatusBreakdown.from(reservations))
                 .roomTypeBreakdown(roomTypeBreakdown)
                 .build();
     }

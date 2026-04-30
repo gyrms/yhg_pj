@@ -32,6 +32,6 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
 
     List<Reservation> findByCheckInDate(LocalDate date);
 
-    List<Reservation> findByOtaChannelAndCheckInDate(OtaChannel otaChannel, LocalDate date);
+    List<Reservation> findByOtaChannelAndCheckInDate(OtaChannel otaChannel, LocalDate checkInDate);
 
 }
