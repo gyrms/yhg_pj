@@ -66,44 +66,4 @@ public class NightAuditService {
                 .noShowReservations(noShowReservations)
                 .build();
     }
-/*
-    @Transactional
-    @Scheduled(cron = "1 0 0 * * *")
-    public NightAuditResponse findCheckoutDataToday2222() {
-
-        BusinessDate businessDate = businessDateRepository.findById(1L)
-                .orElseThrow(() -> new
-                        CustomException(ErrorCode.INTERNAL_SERVER_ERROR));
-
-        List<Reservation> rs = reservationRepository.findCheckoutDataToday(businessDate.getCurrentDate());
-
-        for (Reservation reservation : rs) {
-            // 1. NO_SHOW 변경
-            reservation.noShow();
-
-            // 2. 재고 복구 - 체크인~체크아웃 전날까지 루프
-            for (LocalDate date = reservation.getCheckInDate();date.isBefore(reservation.getCheckOutDate()); date = date.plusDays(1)) {
-                roomDateInventoryRepository.findByRoomTypeAndDate(reservation.getRoomType(), date).ifPresent(roomDateInventory -> roomDateInventory.restore());
-                otaChannelAllotmentRepository.findByOtaChannelAndRoomTypeAndDate(reservation.getOtaChannel(),reservation.getRoomType(),  date).ifPresent(otaChannelAllotment -> otaChannelAllotment.cancel());
-            }
-        }
-
-        List<NightAuditResponse.NoShowReservationResponse> noShowReservations = rs.stream()
-                .map(reservation -> NightAuditResponse.NoShowReservationResponse.builder()
-                        .id(reservation.getId())
-                        .guestName(reservation.getGuestName())
-                        .checkInDate(reservation.getCheckInDate())
-                        .build())
-                .toList();
-
-        return NightAuditResponse.builder()
-                .processedCount(rs.size())
-                .noShowReservations(noShowReservations)
-                .build();
-
-
-    }*/
-
 }
-
-

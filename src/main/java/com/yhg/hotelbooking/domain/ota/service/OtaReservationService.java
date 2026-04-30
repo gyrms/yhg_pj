@@ -92,56 +92,56 @@ public class OtaReservationService {
         try {
             // 최대 5초 기다리고, 락 잡으면 10초 후 자동 해제
             boolean acquired = lock.tryLock(5, 10, TimeUnit.SECONDS);
-            System.out.println(request.getOtaChannel() + request.getOtaReservationId()+"zzzzzzzzzzzzzzzzzzzz" + lockKey);
+            System.out.println(request.getOtaChannel() + request.getOtaReservationId() + "zzzzzzzzzzzzzzzzzzzz" + lockKey);
             if (!acquired) {
                 throw new CustomException(ErrorCode.LOCK_ACQUISITION_FAILED);
             }
 
-                OtaRequestLog oldReservation = otaRequestLogRepository.findByOtaChannelAndOtaReservationId(request.getOtaChannel(), request.getOtaReservationId()).orElse(null);
+            OtaRequestLog oldReservation = otaRequestLogRepository.findByOtaChannelAndOtaReservationId(request.getOtaChannel(), request.getOtaReservationId()).orElse(null);
 
-                if (oldReservation != null) {
-                    return OtaReservationResponse.from(oldReservation.getReservation(), request.getOtaReservationId());
-                }
+            if (oldReservation != null) {
+                return OtaReservationResponse.from(oldReservation.getReservation(), request.getOtaReservationId());
+            }
 
-                // 2. RoomType 조회
-                RoomType roomType = roomTypeRepository.findById(request.getRoomTypeId())
-                        .orElseThrow(() -> new CustomException(ErrorCode.ROOM_TYPE_NOT_FOUND));
+            // 2. RoomType 조회
+            RoomType roomType = roomTypeRepository.findById(request.getRoomTypeId())
+                    .orElseThrow(() -> new CustomException(ErrorCode.ROOM_TYPE_NOT_FOUND));
 
-                bookRoomInventory(request.getCheckInDate(), request.getCheckOutDate(), roomType);
-                bookOtaAllotment(request.getCheckInDate(), request.getCheckOutDate(), request.getOtaChannel(), roomType);
+            bookRoomInventory(request.getCheckInDate(), request.getCheckOutDate(), roomType);
+            bookOtaAllotment(request.getCheckInDate(), request.getCheckOutDate(), request.getOtaChannel(), roomType);
 
-                Reservation rv = Reservation.builder()
-                        .roomType(roomType)
-                        .otaChannel(request.getOtaChannel())
-                        .checkOutDate(request.getCheckOutDate())
-                        .checkInDate(request.getCheckInDate())
-                        .totalPrice(request.getTotalPrice())
-                        .guestName(request.getGuestName())
-                        .guestPhone(request.getGuestPhone())
-                        .build();
-                reservationRepository.save(rv);
+            Reservation rv = Reservation.builder()
+                    .roomType(roomType)
+                    .otaChannel(request.getOtaChannel())
+                    .checkOutDate(request.getCheckOutDate())
+                    .checkInDate(request.getCheckInDate())
+                    .totalPrice(request.getTotalPrice())
+                    .guestName(request.getGuestName())
+                    .guestPhone(request.getGuestPhone())
+                    .build();
+            reservationRepository.save(rv);
 
             redissonClient.getBucket("pending:reservation:" + rv.getId()).set("1", 600, TimeUnit.SECONDS);
 
-                OtaRequestLog otaRequestLog = OtaRequestLog.builder()
-                        .otaChannel(request.getOtaChannel())
-                        .otaReservationId(request.getOtaReservationId())
-                        .reservation(rv)
-                        .requestType(RequestType.CREATE)
-                        .build();
-                otaRequestLogRepository.save(otaRequestLog);
+            OtaRequestLog otaRequestLog = OtaRequestLog.builder()
+                    .otaChannel(request.getOtaChannel())
+                    .otaReservationId(request.getOtaReservationId())
+                    .reservation(rv)
+                    .requestType(RequestType.CREATE)
+                    .build();
+            otaRequestLogRepository.save(otaRequestLog);
 
-                return OtaReservationResponse.from(rv, request.getOtaReservationId());
+            return OtaReservationResponse.from(rv, request.getOtaReservationId());
 
-            } catch (InterruptedException e) {
-                Thread.currentThread().interrupt();
-                throw new CustomException(ErrorCode.LOCK_ACQUISITION_FAILED);
-            } finally {
-                // 내가 잡은 락이면 반드시 해제
-                if (lock.isHeldByCurrentThread()) {
-                    lock.unlock();
-                }
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            throw new CustomException(ErrorCode.LOCK_ACQUISITION_FAILED);
+        } finally {
+            // 내가 잡은 락이면 반드시 해제
+            if (lock.isHeldByCurrentThread()) {
+                lock.unlock();
             }
+        }
     }
 
     private void bookRoomInventory(LocalDate checkin, LocalDate checkout, RoomType roomType) {

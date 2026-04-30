@@ -53,13 +53,12 @@ public class OtaRequestLog {
 
     @Builder
     public OtaRequestLog(OtaChannel otaChannel, String otaReservationId,
-                         Reservation reservation,RequestType requestType) {
+                         Reservation reservation, RequestType requestType) {
         this.otaChannel = otaChannel;
         this.otaReservationId = otaReservationId;
         this.reservation = reservation;
         this.requestType = requestType;
     }
-
 
 
 }

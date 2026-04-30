@@ -22,7 +22,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -30,10 +29,8 @@ import java.util.stream.Collectors;
 public class RoomTypeService {
     private final RoomTypeRepository roomTypeRepository;
     private final HotelRepository hotelRepository;
-
     private final RoomDateInventoryRepository roomDateInventoryRepository;
     private final OtaChannelAllotmentRepository otaChannelAllotmentRepository;
-
 
     public List<RoomTypeResponse> getAllRoomTypes() {
 
@@ -97,19 +94,19 @@ public class RoomTypeService {
 
         for (RoomType roomType : roomList) {
             RoomDateInventory roomDateInventory = roomDateInventoryRepository.findByRoomTypeAndDate(roomType, date)
-                    .orElseThrow(()-> new CustomException(ErrorCode.RESERVATION_NOT_FOUND));
+                    .orElseThrow(() -> new CustomException(ErrorCode.RESERVATION_NOT_FOUND));
 
             List<OtaAllotmentInfo> otaList = new ArrayList<>();
 
             for (OtaChannel ota : OtaChannel.values()) {
 
-                OtaChannelAllotment otaChannelAllotment = otaChannelAllotmentRepository.findByOtaChannelAndRoomTypeAndDate(ota,roomType,date)
-                        .orElseThrow(()-> new CustomException(ErrorCode.ALLOTMENT_NOT_FOUND));
+                OtaChannelAllotment otaChannelAllotment = otaChannelAllotmentRepository.findByOtaChannelAndRoomTypeAndDate(ota, roomType, date)
+                        .orElseThrow(() -> new CustomException(ErrorCode.ALLOTMENT_NOT_FOUND));
 
                 otaList.add(OtaAllotmentInfo.builder()
-                            .channel(ota.name())
-                            .remaining(otaChannelAllotment.getRemainingCount())
-                            .build());
+                        .channel(ota.name())
+                        .remaining(otaChannelAllotment.getRemainingCount())
+                        .build());
             }
 
             roomTypeStatusResponses.add(RoomTypeStatusResponse.builder()
@@ -124,7 +121,7 @@ public class RoomTypeService {
         }
 
 
-      return roomTypeStatusResponses;
+        return roomTypeStatusResponses;
 
     }
 }

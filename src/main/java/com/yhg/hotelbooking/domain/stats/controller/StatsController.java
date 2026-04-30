@@ -1,7 +1,6 @@
 package com.yhg.hotelbooking.domain.stats.controller;
 
 import com.yhg.hotelbooking.domain.otachannel.entity.OtaChannel;
-import com.yhg.hotelbooking.domain.reservation.dto.response.ReservationResponse;
 import com.yhg.hotelbooking.domain.stats.dto.response.ChannelStatsResponse;
 import com.yhg.hotelbooking.domain.stats.dto.response.DailyStatsResponse;
 import com.yhg.hotelbooking.domain.stats.service.StatsService;

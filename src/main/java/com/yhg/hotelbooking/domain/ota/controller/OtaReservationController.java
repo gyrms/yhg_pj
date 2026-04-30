@@ -35,8 +35,8 @@ public class OtaReservationController {
     }
 
     @PutMapping("/{otaResId}")
-    public ResponseEntity<OtaReservationResponse> update(@PathVariable("otaResId") String otaResId,@Valid @RequestBody OtaModifyRequest request) {
-        OtaReservationResponse response = otaReservationService.update(otaResId,request);
+    public ResponseEntity<OtaReservationResponse> update(@PathVariable("otaResId") String otaResId, @Valid @RequestBody OtaModifyRequest request) {
+        OtaReservationResponse response = otaReservationService.update(otaResId, request);
         return ResponseEntity.ok(response);
     }
 }

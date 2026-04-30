@@ -2,7 +2,6 @@ package com.yhg.hotelbooking.domain.reservation.entity;
 
 import com.yhg.hotelbooking.domain.otachannel.entity.OtaChannel;
 import com.yhg.hotelbooking.domain.room.entity.RoomType;
-import jakarta.persistence.Entity;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -97,7 +96,9 @@ public class Reservation {
         this.status = Reservationstatus.NO_SHOW;
     }
 
-    public void expire() { this.status = Reservationstatus.EXPIRED; }
+    public void expire() {
+        this.status = Reservationstatus.EXPIRED;
+    }
 
     public void modify(LocalDate checkInDate, LocalDate checkOutDate, Integer totalPrice) {
         this.checkInDate = checkInDate;
@@ -106,14 +107,14 @@ public class Reservation {
         this.nights = (int) ChronoUnit.DAYS.between(checkInDate, checkOutDate);
     }
 
-    public void setlateArrival () {
+    public void setlateArrival() {
         this.lateArrival = true;
     }
+
     public void earlyCheckout() {
         this.earlyCheckout = true;
         this.status = Reservationstatus.CHECKED_OUT;
     }
-
 
 
 }

@@ -2,8 +2,6 @@ package com.yhg.hotelbooking.domain.dashboard.service;
 
 import com.yhg.hotelbooking.domain.dashboard.dto.response.DashboardResponse;
 import com.yhg.hotelbooking.domain.dashboard.dto.response.ReservationSummary;
-import com.yhg.hotelbooking.domain.ota.dto.request.OtaModifyRequest;
-import com.yhg.hotelbooking.domain.ota.dto.response.OtaReservationResponse;
 import com.yhg.hotelbooking.domain.reservation.dto.response.ReservationResponse;
 import com.yhg.hotelbooking.domain.reservation.entity.Reservation;
 import com.yhg.hotelbooking.domain.reservation.entity.Reservationstatus;
@@ -22,12 +20,7 @@ import java.util.stream.Collectors;
 public class DashboardService {
     private final ReservationRepository reservationRepository;
     private final RoomTypeRepository roomTypeRepository;
-/*    public DashboardResponse getDashboard() {
-        List<Reservation> all = reservationRepository.findAll();
-        DashboardResponse dResponse = DashboardResponse.from(all, all.size());
 
-        return dResponse;
-    }*/
     public DashboardResponse getDashboard() {
         List<Reservation> all = reservationRepository.findAll();
         int totalRoomTypes = (int) roomTypeRepository.count();
