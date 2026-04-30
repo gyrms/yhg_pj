@@ -15,7 +15,7 @@ public class RoomTypeBreakdown {
     private long count;
     private long revenue;
 
-    public static RoomTypeBreakdown from(String grade,List<Reservation> list) {
+    public static RoomTypeBreakdown from(String grade, List<Reservation> list) {
         return RoomTypeBreakdown.builder()
                 .grade(grade)
                 .count(list.size())

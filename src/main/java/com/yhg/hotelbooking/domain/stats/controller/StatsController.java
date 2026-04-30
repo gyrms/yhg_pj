@@ -18,16 +18,16 @@ public class StatsController {
     private final StatsService statsService;
 
     @GetMapping("/daily")
-    public ResponseEntity<DailyStatsResponse> getDailyStats( @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date
+    public ResponseEntity<DailyStatsResponse> getDailyStats(@RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date
     ) {
         DailyStatsResponse response = statsService.getDailyStats(date);
         return ResponseEntity.ok(response);
     }
 
     @GetMapping("/channel/{channel}")
-    public ResponseEntity<ChannelStatsResponse> getChannelStats(@PathVariable OtaChannel channelName,   @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date
+    public ResponseEntity<ChannelStatsResponse> getChannelStats(@PathVariable OtaChannel channelName, @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date
     ) {
-        ChannelStatsResponse response = statsService.getChannelStats(channelName,date);
+        ChannelStatsResponse response = statsService.getChannelStats(channelName, date);
         return ResponseEntity.ok(response);
     }
 }

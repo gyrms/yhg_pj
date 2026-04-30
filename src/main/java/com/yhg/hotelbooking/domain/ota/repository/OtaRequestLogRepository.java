@@ -8,5 +8,6 @@ import java.util.Optional;
 
 public interface OtaRequestLogRepository extends JpaRepository<OtaRequestLog, Long> {
     Optional<OtaRequestLog> findByOtaReservationId(String otaReservationId);
+
     Optional<OtaRequestLog> findByOtaChannelAndOtaReservationId(OtaChannel otaChannel, String otaReservationId);
 }

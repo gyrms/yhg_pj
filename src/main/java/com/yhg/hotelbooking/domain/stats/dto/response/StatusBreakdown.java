@@ -34,8 +34,8 @@ public class StatusBreakdown {
                 .expired(count(list, Reservationstatus.EXPIRED))
                 .build();
     }
-    private static long count(List<Reservation> list, Reservationstatus status)
-    {
+
+    private static long count(List<Reservation> list, Reservationstatus status) {
         return list.stream().filter(r -> r.getStatus() == status).count();
     }
 

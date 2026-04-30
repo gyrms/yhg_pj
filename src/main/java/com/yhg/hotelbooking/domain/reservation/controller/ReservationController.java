@@ -35,6 +35,7 @@ public class ReservationController {
         ReservationResponse response = reservationService.setCheckInRs(rsId);
         return ResponseEntity.ok(response);
     }
+
     /// api/reservations/{id}/checkout
     @PostMapping("/{id}/checkout")
     public ResponseEntity<ReservationResponse> setCheckOutReservation(@PathVariable("id") Long rsId) {

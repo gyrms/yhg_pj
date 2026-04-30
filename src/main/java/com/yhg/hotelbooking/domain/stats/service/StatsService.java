@@ -23,7 +23,7 @@ public class StatsService {
     private final ReservationRepository reservationRepository;
 
     public DailyStatsResponse getDailyStats(LocalDate date) {
-        List<Reservation> reservations= reservationRepository.findByCheckInDate(date);
+        List<Reservation> reservations = reservationRepository.findByCheckInDate(date);
 
         int totalRevenue = reservations.stream().filter(
                         r -> r.getStatus() == Reservationstatus.CONFIRMED
@@ -33,22 +33,22 @@ public class StatsService {
         int totalReservations = reservations.size();
 
         List<ChannelBreakdown> channelBreakdown = Arrays.stream(OtaChannel.values())
-            .map(channel -> {
-                List<Reservation> filtered = reservations.stream()
-                        .filter(r -> r.getOtaChannel() == channel)
-                        .collect(Collectors.toList());
-                return ChannelBreakdown.from(channel.name(), filtered);
-            })
-            .collect(Collectors.toList());
+                .map(channel -> {
+                    List<Reservation> filtered = reservations.stream()
+                            .filter(r -> r.getOtaChannel() == channel)
+                            .collect(Collectors.toList());
+                    return ChannelBreakdown.from(channel.name(), filtered);
+                })
+                .collect(Collectors.toList());
 
         List<RoomTypeBreakdown> roomTypeBreakdown = Arrays.stream(RoomGrade.values())
-            .map(grade -> {
-                List<Reservation> filtered = reservations.stream()
-                        .filter(r -> r.getRoomType().getGrade() == grade)
-                        .collect(Collectors.toList());
-                return RoomTypeBreakdown.from(grade.name(), filtered);
-            })
-            .collect(Collectors.toList());
+                .map(grade -> {
+                    List<Reservation> filtered = reservations.stream()
+                            .filter(r -> r.getRoomType().getGrade() == grade)
+                            .collect(Collectors.toList());
+                    return RoomTypeBreakdown.from(grade.name(), filtered);
+                })
+                .collect(Collectors.toList());
 
         return DailyStatsResponse.builder()
                 .date(date.toString())
@@ -60,11 +60,11 @@ public class StatsService {
                 .build();
     }
 
-    public ChannelStatsResponse getChannelStats(OtaChannel channelName,LocalDate date) {
-        List<Reservation> reservations= reservationRepository.findByOtaChannelAndCheckInDate(channelName,date);
+    public ChannelStatsResponse getChannelStats(OtaChannel channelName, LocalDate date) {
+        List<Reservation> reservations = reservationRepository.findByOtaChannelAndCheckInDate(channelName, date);
 
         int totalRevenue = reservations.stream().filter(
-                r -> r.getStatus() == Reservationstatus.CONFIRMED
+                        r -> r.getStatus() == Reservationstatus.CONFIRMED
                 )
                 .mapToInt(Reservation::getTotalPrice)
                 .sum();

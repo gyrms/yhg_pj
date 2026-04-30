@@ -15,11 +15,11 @@ public class ChannelBreakdown {
     private long count;
     private double revenue;
 
-    public static ChannelBreakdown from(String channelName ,List<Reservation> list) {
-        return  ChannelBreakdown.builder()
+    public static ChannelBreakdown from(String channelName, List<Reservation> list) {
+        return ChannelBreakdown.builder()
                 .channel(channelName)
                 .count(list.size())
-                .revenue(list.stream().filter(r-> r.getStatus()==Reservationstatus.CONFIRMED)
+                .revenue(list.stream().filter(r -> r.getStatus() == Reservationstatus.CONFIRMED)
                         .mapToInt(Reservation::getTotalPrice).sum())
                 .build();
     }

@@ -18,7 +18,7 @@ public interface RoomDateInventoryRepository extends JpaRepository<RoomDateInven
     Optional<RoomDateInventory> findByRoomTypeAndDate(RoomType roomType, LocalDate date);
 
     @Lock(LockModeType.PESSIMISTIC_WRITE)
-    @QueryHints(@QueryHint(name = "jakarta.persistence.lock.timeout", value =  "10000"))
+    @QueryHints(@QueryHint(name = "jakarta.persistence.lock.timeout", value = "10000"))
     @Query("SELECT r FROM RoomDateInventory r WHERE r.roomType = :roomType AND r.date = :date")
     Optional<RoomDateInventory> findByRoomTypeAndDateWithLock(
             @Param("roomType") RoomType roomType,
