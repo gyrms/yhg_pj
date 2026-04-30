@@ -20,12 +20,14 @@ import java.util.stream.Collectors;
 @Transactional(readOnly = true)
 public class StatsService {
 
-    public final ReservationRepository reservationRepository;
+    private final ReservationRepository reservationRepository;
 
     public DailyStatsResponse getDailyStats(LocalDate date) {
         List<Reservation> reservations= reservationRepository.findByCheckInDate(date);
 
-        int totalRevenue = reservations.stream()
+        int totalRevenue = reservations.stream().filter(
+                        r -> r.getStatus() == Reservationstatus.CONFIRMED
+                )
                 .mapToInt(Reservation::getTotalPrice)
                 .sum();
         int totalReservations = reservations.size();
