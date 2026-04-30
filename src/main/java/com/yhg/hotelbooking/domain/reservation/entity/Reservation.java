@@ -97,6 +97,8 @@ public class Reservation {
         this.status = Reservationstatus.NO_SHOW;
     }
 
+    public void expire() { this.status = Reservationstatus.EXPIRED; }
+
     public void modify(LocalDate checkInDate, LocalDate checkOutDate, Integer totalPrice) {
         this.checkInDate = checkInDate;
         this.checkOutDate = checkOutDate;
@@ -111,6 +113,8 @@ public class Reservation {
         this.earlyCheckout = true;
         this.status = Reservationstatus.CHECKED_OUT;
     }
+
+
 
 }
 

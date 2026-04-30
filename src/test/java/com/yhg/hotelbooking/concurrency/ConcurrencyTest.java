@@ -105,8 +105,10 @@ public class ConcurrencyTest {
 
     @BeforeEach
     void setUp() {
-        otaRequestLogRepository.deleteAll();
-        reservationRepository.deleteAll();
+   /*     otaRequestLogRepository.deleteAll();
+        reservationRepository.deleteAll();*/
+        otaRequestLogRepository.deleteAllInBatch();
+        reservationRepository.deleteAllInBatch();
 
         List<RoomDateInventory> inventories = roomDateInventoryRepository.findAll();
         inventories.forEach(RoomDateInventory::reset);

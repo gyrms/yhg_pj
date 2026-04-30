@@ -92,6 +92,7 @@ public class OtaReservationService {
         try {
             // 최대 5초 기다리고, 락 잡으면 10초 후 자동 해제
             boolean acquired = lock.tryLock(5, 10, TimeUnit.SECONDS);
+            System.out.println(request.getOtaChannel() + request.getOtaReservationId()+"zzzzzzzzzzzzzzzzzzzz" + lockKey);
             if (!acquired) {
                 throw new CustomException(ErrorCode.LOCK_ACQUISITION_FAILED);
             }
@@ -119,6 +120,8 @@ public class OtaReservationService {
                         .guestPhone(request.getGuestPhone())
                         .build();
                 reservationRepository.save(rv);
+
+            redissonClient.getBucket("pending:reservation:" + rv.getId()).set("1", 600, TimeUnit.SECONDS);
 
                 OtaRequestLog otaRequestLog = OtaRequestLog.builder()
                         .otaChannel(request.getOtaChannel())
